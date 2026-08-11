@@ -1,20 +1,19 @@
 "use client";
 import { useState } from "react";
-
+import { supabase } from "../lib/supabase";
 export default function Home() {
   const [customerName, setCustomerName] = useState("");
   const [accountInfo, setAccountInfo] = useState("");
-  const [service, setService] = useState("Lv 1 - 50 (100.000đ)");
+  const [service, setService] = useState("Cày Level 1 - 50");
   const [amount, setAmount] = useState(100000);
   const [orderId, setOrderId] = useState("CT" + Math.floor(1000 + Math.random() * 9000));
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // ⚠️ THAY THÔNG TIN THỰC TẾ CỦA BẠN VÀO ĐÂY
-  const BANK_ID = "MB"; // Mã ngân hàng: MB, VCB, TCB, ICB, ACB...
-  const ACCOUNT_NO = "0987654321"; // Số tài khoản ngân hàng
-  const ACCOUNT_NAME = "NGUYEN VAN A"; // Tên chủ tài khoản (viết hoa không dấu)
+  const BANK_ID = "MB";
+  const ACCOUNT_NO = "0987654321";
+  const ACCOUNT_NAME = "NGUYEN VAN A";
 
-  // Danh sách các gói cày thuê
   const packages = [
     { name: "Cày Level 1 - 50", price: 100000 },
     { name: "Cày Level 50 - 100", price: 250000 },
@@ -30,13 +29,34 @@ export default function Home() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!customerName || !accountInfo) {
       alert("Vui lòng điền đầy đủ thông tin!");
       return;
     }
-    setIsSubmitted(true);
+
+    setLoading(true);
+
+    // Gửi dữ liệu đơn hàng trực tiếp lên Supabase
+    const { error } = await supabase.from("orders").insert([
+      {
+        order_id: orderId,
+        customer_name: customerName,
+        account_info: accountInfo,
+        service: service,
+        amount: amount,
+        status: "Chờ thanh toán",
+      },
+    ]);
+
+    setLoading(false);
+
+    if (error) {
+      alert("Lỗi khi gửi đơn: " + error.message);
+    } else {
+      setIsSubmitted(true);
+    }
   };
 
   const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-compact2.png?amount=${amount}&addInfo=${orderId}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`;
@@ -91,9 +111,10 @@ export default function Home() {
             <div className="pt-2">
               <button
                 type="submit"
-                className="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-colors"
+                disabled={loading}
+                className="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-colors disabled:opacity-50"
               >
-                Tạo Đơn & Thanh Toán ({amount.toLocaleString("vi-VN")} VNĐ)
+                {loading ? "Đang gửi đơn..." : `Tạo Đơn & Thanh Toán (${amount.toLocaleString("vi-VN")} VNĐ)`}
               </button>
             </div>
           </form>
@@ -115,10 +136,13 @@ export default function Home() {
             </p>
 
             <button
-              onClick={() => setIsSubmitted(false)}
+              onClick={() => {
+                setIsSubmitted(false);
+                setOrderId("CT" + Math.floor(1000 + Math.random() * 9000));
+              }}
               className="text-xs text-gray-400 underline hover:text-white mt-2"
             >
-              ← Quay lại chỉnh sửa thông tin
+              ← Tạo đơn hàng mới
             </button>
           </div>
         )}
