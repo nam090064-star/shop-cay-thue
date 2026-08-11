@@ -1,136 +1,129 @@
-'use client'
+"use client";
 
-import { supabase } from "../lib/supabase";
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  'https://oixrycugagytnshogwrz.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJiY2N1ZnN2dmF0eXVteW5oZHZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNzA3MzAsImV4cCI6MjEwMTg0NjczMH0.FCU4Cqn-jLnQ5mQZy6xX-wBiWna5W_j9f--ZFfX6Ii4'
-)
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function AdminPage() {
-  const [title, setTitle] = useState('')
-  const [price, setPrice] = useState('')
-  const [description, setDescription] = useState('')
-  const [services, setServices] = useState<any[]>([])
+  const [title, setTitle] = useState("");
+  const [price, setPrice] = useState("");
+  const [description, setDescription] = useState("");
+  const [services, setServices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  // Hàm tải danh sách dịch vụ hiện có
+  // Lấy danh sách dịch vụ hiện tại
   const fetchServices = async () => {
-    const { data } = await supabase.from('services').select('*').order('id', { ascending: false })
-    if (data) setServices(data)
-  }
+    const { data, error } = await supabase.from("services").select("*");
+    if (!error && data) {
+      setServices(data);
+    }
+  };
 
   useEffect(() => {
-    fetchServices()
-  }, [])
+    fetchServices();
+  }, []);
 
-  // Hàm thêm dịch vụ mới vào Supabase
+  // Hàm thêm dịch vụ mới
   const handleAddService = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
+    if (!title || !price) {
+      alert("Vui lòng nhập tên dịch vụ và giá tiền!");
+      return;
+    }
 
-    const { error } = await supabase.from('services').insert([
-      { title, price, description }
-    ])
+    setLoading(true);
+
+    const { error } = await supabase.from("services").insert([
+      {
+        title: title,
+        price: Number(price),
+        description: description,
+      },
+    ]);
+
+    setLoading(false);
 
     if (error) {
-      alert('Lỗi: ' + error.message)
+      alert("Lỗi: " + error.message);
     } else {
-      alert('Thêm dịch vụ thành công!')
-      setTitle('')
-      setPrice('')
-      setDescription('')
-      fetchServices() // Tải lại danh sách ngay lập tức
+      alert("Thêm dịch vụ thành công!");
+      setTitle("");
+      setPrice("");
+      setDescription("");
+      fetchServices();
     }
-  }
-
-  // Hàm xóa dịch vụ
-  const handleDelete = async (id: number) => {
-    if (confirm('Bạn có chắc muốn xóa dịch vụ này?')) {
-      await supabase.from('services').delete().eq('id', id)
-      fetchServices()
-    }
-  }
+  };
 
   return (
-    <main className="min-h-screen bg-slate-900 text-white p-6">
-      <div className="max-w-2xl mx-auto bg-slate-800 p-6 rounded-xl border border-slate-700">
-        <h1 className="text-2xl font-bold text-yellow-400 mb-6 uppercase text-center">
+    <div className="min-h-screen bg-slate-950 text-white p-6 flex flex-col items-center">
+      <div className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-lg">
+        <h1 className="text-2xl font-bold mb-6 text-center text-amber-500">
           Quản Lý Dịch Vụ Cày Thuê
         </h1>
 
-        {/* Form thêm dịch vụ mới */}
-        <form onSubmit={handleAddService} className="flex flex-col gap-4 mb-8 bg-slate-700/50 p-4 rounded-lg">
-          <h2 className="text-lg font-semibold text-slate-200">Thêm Dịch Vụ Mới</h2>
-          
+        <form onSubmit={handleAddService} className="space-y-4">
           <div>
-            <label className="block text-sm mb-1 text-slate-300">Tên dịch vụ:</label>
+            <label className="block text-sm font-medium mb-1">Tên dịch vụ:</label>
             <input
               type="text"
-              placeholder="Ví dụ: Cày Level 1 - 500"
+              placeholder="VD: Cày Level 1-700"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full p-2.5 rounded bg-slate-800 text-white border border-slate-600 focus:outline-none focus:border-yellow-400"
-              required
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-amber-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm mb-1 text-slate-300">Giá tiền (VNĐ):</label>
+            <label className="block text-sm font-medium mb-1">Giá tiền (VNĐ):</label>
             <input
-              type="text"
-              placeholder="Ví dụ: 100.000"
+              type="number"
+              placeholder="VD: 50000"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="w-full p-2.5 rounded bg-slate-800 text-white border border-slate-600 focus:outline-none focus:border-yellow-400"
-              required
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-amber-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm mb-1 text-slate-300">Mô tả dịch vụ:</label>
-            <input
-              type="text"
-              placeholder="Ví dụ: Hoàn thành trong 24h, kèm x2 Exp"
+            <label className="block text-sm font-medium mb-1">Mô tả dịch vụ:</label>
+            <textarea
+              placeholder="VD: Hoàn thành trong ngày"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full p-2.5 rounded bg-slate-800 text-white border border-slate-600 focus:outline-none focus:border-yellow-400"
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-amber-500"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full mt-2 bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold py-2.5 rounded transition"
+            disabled={loading}
+            className="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-lg transition"
           >
-            + Thêm Dịch Vụ
+            {loading ? "Đang xử lý..." : "+ Thêm Dịch Vụ"}
           </button>
         </form>
 
-        {/* Danh sách dịch vụ đã tạo */}
-        <div>
-          <h2 className="text-lg font-semibold text-slate-200 mb-4">Danh Sách Dịch Vụ Hiện Có</h2>
+        <h2 className="text-xl font-bold mt-10 mb-4">Danh Sách Dịch Vụ Hiện Có</h2>
+        <div className="space-y-3">
           {services.length === 0 ? (
             <p className="text-slate-400 text-sm">Chưa có dịch vụ nào.</p>
           ) : (
-            <div className="flex flex-col gap-3">
-              {services.map((item) => (
-                <div key={item.id} className="flex justify-between items-center bg-slate-700 p-3 rounded border border-slate-600">
-                  <div>
-                    <p className="font-bold text-yellow-400">{item.title}</p>
-                    <p className="text-sm text-slate-300">{item.price} VNĐ</p>
-                    {item.description && <p className="text-xs text-slate-400">{item.description}</p>}
-                  </div>
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded transition"
-                  >
-                    Xóa
-                  </button>
+            services.map((item) => (
+              <div
+                key={item.id}
+                className="bg-slate-800 p-4 rounded-lg flex justify-between items-center"
+              >
+                <div>
+                  <h3 className="font-bold text-amber-400">{item.title}</h3>
+                  <p className="text-sm text-slate-300">{item.description}</p>
                 </div>
-              ))}
-            </div>
+                <span className="font-bold text-green-400">
+                  {Number(item.price).toLocaleString("vi-VN")} VNĐ
+                </span>
+              </div>
+            ))
           )}
         </div>
       </div>
-    </main>
-  )
+    </div>
+  );
 }
