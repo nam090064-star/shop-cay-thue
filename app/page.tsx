@@ -116,7 +116,7 @@ export default function Home() {
         onClick={() => setSelectedCategory(null)}
       >
         <img 
-  src="/logo.png" 
+  src="/logo.png.png" 
   alt="Logo Roblox Giá Rẻ" 
   className="h-10 md:h-14 object-contain" 
 />
