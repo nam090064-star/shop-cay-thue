@@ -23,8 +23,8 @@ export default function Home() {
   // Form Đặt Acc V4 State
   const [accContact, setAccContact] = useState("");
   const [accPackages] = useState([
-    { id: 1, title: "Acc Blox Fruits V4 Full Gear (Random Tộc)", price: 150000, desc: "Level Max + V4 Full Gear + Trái Ác Quỷ ngon" },
-    { id: 2, title: "Acc Blox Fruits V4 Full Gear (Tộc Quỷ)", price: 200000, desc: "Level Max + V4 Full Gear Tộc Quỷ + Melee Godhuman" },
+    { id: 1, title: "Acc Blox Fruits V4 Full Gear (Random Tộc)", price: 45000, desc: "Level Max + V4 Full Gear + Trái Ác Quỷ ngon" },
+    { id: 2, title: "Acc Blox Fruits V4 Full Gear (Tộc Quỷ)", price: 30000, desc: "Level Max + V4 Full Gear Tộc Quỷ + Melee Godhuman" },
   ]);
   const [selectedAcc, setSelectedAcc] = useState<any>(accPackages[0]);
 
