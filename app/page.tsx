@@ -14,8 +14,8 @@ export default function Home() {
 
   // Thông tin ngân hàng của bạn
   const BANK_ID = "MB";
-  const ACCOUNT_NO = "0987654321"; // Thay STK của bạn
-  const ACCOUNT_NAME = "NGUYEN VAN A"; // Thay tên của bạn
+  const ACCOUNT_NO = "07908024409999"; // Thay STK của bạn
+  const ACCOUNT_NAME = "NGUYEN NGOC THANG"; // Thay tên của bạn
 
   // 1. Lấy danh sách dịch vụ từ Supabase
   useEffect(() => {
@@ -88,8 +88,8 @@ export default function Home() {
     <div className="min-h-screen bg-slate-950 text-white p-4 md:p-8 flex flex-col items-center justify-center">
       <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
         <h1 className="text-2xl md:text-3xl font-extrabold mb-6 text-center text-amber-500 tracking-wide uppercase">
-          KURORYU - SHOP CÀY THUÊ
-        </h1>
+  NGUYỄN THẮNG - SHOP CÀY THUÊ
+</h1>
 
         {!isSubmitted ? (
           <form onSubmit={handleSubmit} className="space-y-5">
