@@ -125,15 +125,24 @@ export default function Home() {
 />
       </div>
 
-      {/* Các nút bấm bên phải (Nạp tiền, Đơn hàng, v.v.) */}
-      <div className="flex items-center gap-2 md:gap-3 text-xs md:text-sm">
-        <button
-          onClick={() => setModalType("napbank")}
-          className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg font-medium"
-        >
-          Nạp Tiền
-        </button>
-      </div>
+      {/* Các nút bấm ở góc phải Header */}
+<div className="flex items-center gap-2 md:gap-3 text-xs md:text-sm">
+  {/* Nút Đăng nhập */}
+  <button
+    onClick={() => setModalType("login")}
+    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-medium"
+  >
+    Đăng Nhập
+  </button>
+
+  {/* Nút Nạp tiền */}
+  <button
+    onClick={() => setModalType("napbank")}
+    className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg font-medium"
+  >
+    Nạp Tiền
+  </button>
+</div>
 
     </header>
       {/* 2. MAIN CONTENT */}
