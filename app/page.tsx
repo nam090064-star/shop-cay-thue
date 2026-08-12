@@ -4,30 +4,37 @@ import { useState, useEffect } from "react";
 import { supabase } from "./lib/supabase";
 
 export default function Home() {
+  // Modal State
+  const [modalType, setModalType] = useState<"login" | "register" | "napbank" | "napthe" | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<"caythue" | "accv4" | null>(null);
 
-  // State Form Cày Thuê
+  // Form Nạp Thẻ Cào State
+  const [telco, setTelco] = useState("VIETTEL");
+  const [amount, setAmount] = useState("10000");
+  const [pin, setPin] = useState("");
+  const [serial, setSerial] = useState("");
+
+  // Form Đặt Đơn Cày Thuê State
   const [accountInfo, setAccountInfo] = useState("");
   const [note, setNote] = useState("");
   const [services, setServices] = useState<any[]>([]);
   const [selectedService, setSelectedService] = useState<any>(null);
 
-  // State Form Bán Acc V4
+  // Form Đặt Acc V4 State
   const [accContact, setAccContact] = useState("");
-  const [accPackages, setAccPackages] = useState([
+  const [accPackages] = useState([
     { id: 1, title: "Acc Blox Fruits V4 Full Gear (Random Tộc)", price: 150000, desc: "Level Max + V4 Full Gear + Trái Ác Quỷ ngon" },
     { id: 2, title: "Acc Blox Fruits V4 Full Gear (Tộc Quỷ)", price: 200000, desc: "Level Max + V4 Full Gear Tộc Quỷ + Melee Godhuman" },
-    { id: 3, title: "Acc Blox Fruits V4 Full Gear (Tộc Thỏ/Thiên Thần)", price: 220000, desc: "Level Max + V4 Full Gear + Song Kiếm Oden" },
   ]);
   const [selectedAcc, setSelectedAcc] = useState<any>(accPackages[0]);
 
   const [loading, setLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // Ngân hàng
+  // Ngân hàng cấu hình VietQR
   const BANK_ID = "MB";
-  const ACCOUNT_NO = "0987654321"; // STK thật
-  const ACCOUNT_NAME = "NGUYEN VAN A"; // Tên thật
+  const ACCOUNT_NO = "0987654321"; // STK thật của bạn
+  const ACCOUNT_NAME = "NGUYEN VAN A"; // Tên chủ tài khoản
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -40,6 +47,17 @@ export default function Home() {
     fetchServices();
   }, []);
 
+  // Xử lý gửi Thẻ Cào
+  const handleCardSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pin || !serial) return alert("Vui lòng nhập Mã thẻ và Serial!");
+    alert(`Đã gửi thẻ ${telco} mệnh giá ${Number(amount).toLocaleString()}đ thành công! Hệ thống đang xử lý.`);
+    setModalType(null);
+    setPin("");
+    setSerial("");
+  };
+
+  // Xử lý Cày Thuê
   const handleServiceSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!accountInfo || !selectedService) return alert("Vui lòng nhập thông tin tài khoản!");
@@ -62,6 +80,7 @@ export default function Home() {
     else setIsSubmitted(true);
   };
 
+  // Xử lý Mua Acc
   const handleAccSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!accContact || !selectedAcc) return alert("Vui lòng nhập Zalo/SĐT!");
@@ -87,55 +106,89 @@ export default function Home() {
   const currentPrice = selectedCategory === "caythue" ? selectedService?.price : selectedAcc?.price;
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-800 p-4 md:p-8 flex flex-col items-center">
-      <div className="w-full max-w-4xl">
-        <h1 className="text-2xl md:text-3xl font-extrabold mb-8 text-center text-sky-600 uppercase tracking-wide">
-          NGUYỄN THẮNG - SHOP ROBLOX UY TÍN
-        </h1>
+    <div className="min-h-screen bg-slate-100 text-slate-800">
+      {/* 1. HEADER / THANH MENU CHÍNH */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="font-black text-xl text-sky-600 tracking-wider uppercase cursor-pointer" onClick={() => setSelectedCategory(null)}>
+            SHOPNGUYENTHANG.COM
+          </div>
 
-        {/* 1. MÀN HÌNH CHỌN CARD (KHI CHƯA BẤM VÀO MỤC NÀO) */}
+          <div className="flex items-center gap-2 md:gap-3 text-xs md:text-sm font-semibold">
+            <button
+              onClick={() => setModalType("napbank")}
+              className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 rounded-lg transition"
+            >
+              🏦 Nạp Ngân Hàng
+            </button>
+            <button
+              onClick={() => setModalType("napthe")}
+              className="bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-lg transition"
+            >
+              💳 Nạp Thẻ Cào
+            </button>
+            <button
+              onClick={() => setModalType("login")}
+              className="bg-sky-500 hover:bg-sky-600 text-white px-3 py-2 rounded-lg transition"
+            >
+              Đăng Nhập
+            </button>
+            <button
+              onClick={() => setModalType("register")}
+              className="border border-sky-500 text-sky-600 hover:bg-sky-50 px-3 py-2 rounded-lg transition hidden md:block"
+            >
+              Đăng Ký
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* 2. MAIN CONTENT */}
+      <main className="max-w-6xl mx-auto px-4 py-6">
+        {/* BANNER THÔNG BÁO */}
+        <div className="bg-sky-50 border border-sky-200 rounded-2xl p-4 mb-6 text-sm text-sky-900 shadow-sm">
+          📢 <b>THÔNG BÁO:</b> Shop duyệt đơn tự động 24/7. Uy tín - Giá rẻ - Bảo hành trọn đời cho anh em!
+        </div>
+
+        {/* 3. MÀN HÌNH CHỌN CARD DANH MỤC */}
         {!selectedCategory && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-            {/* CARD 1: CÀY THUÊ BLOX-FRUITS */}
-            <div className="bg-white rounded-2xl border border-sky-100 shadow-xl overflow-hidden flex flex-col items-center hover:shadow-2xl transition">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {/* CARD 1: CÀY THUÊ */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden flex flex-col items-center hover:shadow-xl transition">
               <img
-                src="https://via.placeholder.com/400x220/1e293b/ffffff?text=CAY+THUE+BLOX+FRUITS"
-                alt="Cày thuê Blox Fruits"
+                src="https://via.placeholder.com/500x250/0284c7/ffffff?text=CAY+THUE+BLOX+FRUITS"
+                alt="Cày Thuê"
                 className="w-full h-48 object-cover"
               />
-              <div className="p-5 w-full text-center flex flex-col items-center">
-                <h2 className="text-xl font-extrabold text-slate-900 mb-2 uppercase">
-                  CÀY THUÊ BLOX-FRUITS
-                </h2>
-                <span className="bg-emerald-50 text-emerald-600 border border-emerald-200 text-xs font-bold px-3 py-1 rounded-full mb-4">
+              <div className="p-5 w-full text-center">
+                <h2 className="text-xl font-bold text-slate-900 mb-2 uppercase">CÀY THUÊ BLOX-FRUITS</h2>
+                <span className="inline-block bg-emerald-50 text-emerald-600 border border-emerald-200 text-xs font-bold px-3 py-1 rounded-full mb-4">
                   Sẵn Sàng
                 </span>
                 <button
                   onClick={() => setSelectedCategory("caythue")}
-                  className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2"
+                  className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 rounded-xl transition shadow-md"
                 >
                   XEM TẤT CẢ ➔
                 </button>
               </div>
             </div>
 
-            {/* CARD 2: ACC BLOX FRUITS V4 FULL GEAR */}
-            <div className="bg-white rounded-2xl border border-sky-100 shadow-xl overflow-hidden flex flex-col items-center hover:shadow-2xl transition">
+            {/* CARD 2: ACC V4 */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden flex flex-col items-center hover:shadow-xl transition">
               <img
-                src="https://via.placeholder.com/400x220/0f172a/ffffff?text=ACC+V4+FULL+GEAR"
-                alt="Acc Blox Fruits V4"
+                src="https://via.placeholder.com/500x250/0f172a/ffffff?text=ACC+V4+FULL+GEAR"
+                alt="Acc V4"
                 className="w-full h-48 object-cover"
               />
-              <div className="p-5 w-full text-center flex flex-col items-center">
-                <h2 className="text-xl font-extrabold text-sky-500 mb-2 uppercase">
-                  ACC BLOX-FRUITS V4 FULL GEAR
-                </h2>
-                <span className="bg-sky-50 text-sky-600 border border-sky-200 text-xs font-bold px-3 py-1 rounded-full mb-4">
+              <div className="p-5 w-full text-center">
+                <h2 className="text-xl font-bold text-sky-600 mb-2 uppercase">ACC BLOX-FRUITS V4 FULL GEAR</h2>
+                <span className="inline-block bg-sky-50 text-sky-600 border border-sky-200 text-xs font-bold px-3 py-1 rounded-full mb-4">
                   Còn 15
                 </span>
                 <button
                   onClick={() => setSelectedCategory("accv4")}
-                  className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2"
+                  className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 rounded-xl transition shadow-md"
                 >
                   XEM TẤT CẢ ➔
                 </button>
@@ -144,25 +197,23 @@ export default function Home() {
           </div>
         )}
 
-        {/* 2. MÀN HÌNH ĐẶT HÀNG (KHI ĐÃ BẤM XEM TẤT CẢ) */}
+        {/* 4. MÀN HÌNH ĐẶT HÀNG FORM */}
         {selectedCategory && (
-          <div className="max-w-xl mx-auto bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl">
+          <div className="max-w-xl mx-auto bg-white border border-slate-200 rounded-2xl p-6 shadow-xl">
             <button
               onClick={() => { setSelectedCategory(null); setIsSubmitted(false); }}
               className="text-xs font-bold text-sky-600 hover:underline mb-4 inline-block"
             >
-              ⬅ Quản lại danh mục chính
+              ⬅ Quay lại danh mục chính
             </button>
 
             {!isSubmitted ? (
               <>
                 {selectedCategory === "caythue" && (
                   <form onSubmit={handleServiceSubmit} className="space-y-4">
-                    <h2 className="text-xl font-bold text-slate-800 border-b pb-2">
-                      ⚔️ DỊCH VỤ CÀY THUÊ
-                    </h2>
+                    <h2 className="text-xl font-bold text-slate-800 border-b pb-2">⚔️ DỊCH VỤ CÀY THUÊ</h2>
                     <div>
-                      <label className="block text-sm font-semibold mb-1">1. Chọn dịch vụ:</label>
+                      <label className="block text-sm font-semibold mb-1">1. Chọn gói cày:</label>
                       <select
                         value={selectedService?.id || ""}
                         onChange={(e) => {
@@ -213,9 +264,7 @@ export default function Home() {
 
                 {selectedCategory === "accv4" && (
                   <form onSubmit={handleAccSubmit} className="space-y-4">
-                    <h2 className="text-xl font-bold text-sky-600 border-b pb-2">
-                      🔥 ACC BLOX FRUITS V4 FULL GEAR
-                    </h2>
+                    <h2 className="text-xl font-bold text-sky-600 border-b pb-2">🔥 ACC BLOX FRUITS V4 FULL GEAR</h2>
                     <div>
                       <label className="block text-sm font-semibold mb-1">1. Chọn gói Acc:</label>
                       <select
@@ -269,7 +318,7 @@ export default function Home() {
                 <p className="text-sm text-slate-600">Quét mã QR để chuyển khoản thanh toán:</p>
                 {currentPrice && (
                   <img
-                    src={`https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-compact2.png?amount=${currentPrice}&addInfo=THANH%20TOAN%20SHOP%20ROBLOX`}
+                    src={`https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-compact2.png?amount=${currentPrice}&addInfo=THANH%20TOAN%20SHOP`}
                     alt="Mã QR"
                     className="w-full border-2 border-sky-500 rounded-xl p-2 bg-white shadow-md"
                   />
@@ -284,7 +333,144 @@ export default function Home() {
             )}
           </div>
         )}
-      </div>
+      </main>
+
+      {/* 5. MODALS POPUP (NẠP NGÂN HÀNG / NẠP THẺ CÀO / ĐĂNG NHẬP / ĐĂNG KÝ) */}
+      {modalType && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
+            <button
+              onClick={() => setModalType(null)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-lg"
+            >
+              ✕
+            </button>
+
+            {/* MODAL NẠP BANK */}
+            {modalType === "napbank" && (
+              <div className="text-center space-y-4">
+                <h3 className="text-lg font-bold text-slate-800 border-b pb-2">🏦 NẠP TIỀN QUA NGÂN HÀNG (VIETQR)</h3>
+                <img
+                  src={`https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-compact2.png?amount=50000&addInfo=NAP%20TIEN%20SHOP`}
+                  alt="Mã QR Nạp Tiền"
+                  className="w-64 mx-auto border rounded-xl p-2 bg-white shadow-sm"
+                />
+                <div className="text-left bg-slate-50 p-3 rounded-xl text-xs space-y-1 text-slate-700">
+                  <p><b>Ngân hàng:</b> {BANK_ID}</p>
+                  <p><b>Số tài khoản:</b> {ACCOUNT_NO}</p>
+                  <p><b>Chủ tài khoản:</b> {ACCOUNT_NAME}</p>
+                  <p><b>Nội dung CK:</b> NAPTIEN [Tên_Tài_Khoản]</p>
+                </div>
+              </div>
+            )}
+
+            {/* MODAL NẠP THẺ CÀO */}
+            {modalType === "napthe" && (
+              <form onSubmit={handleCardSubmit} className="space-y-4">
+                <h3 className="text-lg font-bold text-slate-800 border-b pb-2">💳 NẠP THẺ CÀO TỰ ĐỘNG</h3>
+                <div>
+                  <label className="block text-xs font-bold mb-1">Loại thẻ:</label>
+                  <select
+                    value={telco}
+                    onChange={(e) => setTelco(e.target.value)}
+                    className="w-full border rounded-xl p-2.5 text-sm bg-slate-50"
+                  >
+                    <option value="VIETTEL">Viettel</option>
+                    <option value="VINAPHONE">Vinaphone</option>
+                    <option value="MOBIFONE">Mobifone</option>
+                    <option value="ZING">Zing</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold mb-1">Mệnh giá:</label>
+                  <select
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    className="w-full border rounded-xl p-2.5 text-sm bg-slate-50"
+                  >
+                    <option value="10000">10.000 VNĐ</option>
+                    <option value="20000">20.000 VNĐ</option>
+                    <option value="50000">50.000 VNĐ</option>
+                    <option value="100000">100.000 VNĐ</option>
+                    <option value="200000">200.000 VNĐ</option>
+                    <option value="500000">500.000 VNĐ</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold mb-1">Mã thẻ (PIN):</label>
+                  <input
+                    type="text"
+                    placeholder="Nhập mã mã thẻ cào"
+                    value={pin}
+                    onChange={(e) => setPin(e.target.value)}
+                    className="w-full border rounded-xl p-2.5 text-sm bg-slate-50"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold mb-1">Số Serial:</label>
+                  <input
+                    type="text"
+                    placeholder="Nhập số serial"
+                    value={serial}
+                    onChange={(e) => setSerial(e.target.value)}
+                    className="w-full border rounded-xl p-2.5 text-sm bg-slate-50"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl transition shadow"
+                >
+                  NẠP THẺ NGAY
+                </button>
+              </form>
+            )}
+
+            {/* MODAL ĐĂNG NHẬP */}
+            {modalType === "login" && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-bold text-slate-800 border-b pb-2">🔑 ĐĂNG NHẬP TÀI KHOẢN</h3>
+                <div>
+                  <label className="block text-xs font-bold mb-1">Tài khoản / Email:</label>
+                  <input type="text" placeholder="Tên đăng nhập" className="w-full border rounded-xl p-2.5 text-sm bg-slate-50" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold mb-1">Mật khẩu:</label>
+                  <input type="password" placeholder="Mật khẩu" className="w-full border rounded-xl p-2.5 text-sm bg-slate-50" />
+                </div>
+                <button
+                  onClick={() => setModalType(null)}
+                  className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 rounded-xl transition shadow"
+                >
+                  ĐĂNG NHẬP
+                </button>
+              </div>
+            )}
+
+            {/* MODAL ĐĂNG KÝ */}
+            {modalType === "register" && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-bold text-slate-800 border-b pb-2">📝 ĐĂNG KÝ TÀI KHOẢN MỚI</h3>
+                <div>
+                  <label className="block text-xs font-bold mb-1">Tên đăng nhập:</label>
+                  <input type="text" placeholder="Nhập tên đăng nhập" className="w-full border rounded-xl p-2.5 text-sm bg-slate-50" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold mb-1">Mật khẩu:</label>
+                  <input type="password" placeholder="Tạo mật khẩu" className="w-full border rounded-xl p-2.5 text-sm bg-slate-50" />
+                </div>
+                <button
+                  onClick={() => setModalType(null)}
+                  className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 rounded-xl transition shadow"
+                >
+                  ĐĂNG KÝ NGAY
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
