@@ -156,10 +156,10 @@ export default function Home() {
             {/* CARD 1: CÀY THUÊ */}
             <div className="bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden flex flex-col items-center hover:shadow-xl transition">
               <img
-                src="https://via.placeholder.com/500x250/0284c7/ffffff?text=CAY+THUE+BLOX+FRUITS"
-                alt="Cày Thuê"
-                className="w-full h-48 object-cover"
-              />
+  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRe6FpAyfVSQM27Y4axZI8m9i0dkg68F9nEP7pLgCHE-NCP1jDJyzAv6VGG&s=10"
+  alt="Cày Thuê"
+  className="w-full h-48 object-cover"
+/>
               <div className="p-5 w-full text-center">
                 <h2 className="text-xl font-bold text-slate-900 mb-2 uppercase">CÀY THUÊ BLOX-FRUITS</h2>
                 <span className="inline-block bg-emerald-50 text-emerald-600 border border-emerald-200 text-xs font-bold px-3 py-1 rounded-full mb-4">
@@ -177,10 +177,10 @@ export default function Home() {
             {/* CARD 2: ACC V4 */}
             <div className="bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden flex flex-col items-center hover:shadow-xl transition">
               <img
-                src="https://via.placeholder.com/500x250/0f172a/ffffff?text=ACC+V4+FULL+GEAR"
-                alt="Acc V4"
-                className="w-full h-48 object-cover"
-              />
+  src="https://assetsio.gnwcdn.com/roblox-blox-fruits-codes-list.jpg?width=1600&height=900&fit=crop&quality=100&format=png&enable=upscale&auto=webp"
+  alt="Acc V4"
+  className="w-full h-48 object-cover"
+/>
               <div className="p-5 w-full text-center">
                 <h2 className="text-xl font-bold text-sky-600 mb-2 uppercase">ACC BLOX-FRUITS V4 FULL GEAR</h2>
                 <span className="inline-block bg-sky-50 text-sky-600 border border-sky-200 text-xs font-bold px-3 py-1 rounded-full mb-4">
