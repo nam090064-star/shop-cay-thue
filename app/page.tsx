@@ -113,7 +113,10 @@ export default function Home() {
       {/* Logo Shop */}
       <div 
         className="cursor-pointer flex items-center" 
-        onClick={() => setSelectedCategory(null)}
+        onClick={() => {
+  setSelectedCategory(null);
+  setSelectedService(null);
+}}
       >
         <img 
   src="/logo.png.png" 
