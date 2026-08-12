@@ -32,7 +32,7 @@ export default function Admin() {
     e.preventDefault();
     if (!title || !price) return alert("Vui lòng nhập tên và giá!");
 
-    // Tự động gắn tên danh mục vào tiêu đề
+    // Ghép tên danh mục vào tiêu đề hoặc lưu chuẩn
     const fullTitle = `[${category}] ${title}`;
 
     const { error } = await supabase.from("services").insert([
