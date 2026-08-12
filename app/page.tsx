@@ -106,43 +106,33 @@ export default function Home() {
   const currentPrice = selectedCategory === "caythue" ? selectedService?.price : selectedAcc?.price;
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-800">
-      {/* 1. HEADER / THANH MENU CHÍNH */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="font-black text-xl text-sky-600 tracking-wider uppercase cursor-pointer" onClick={() => setSelectedCategory(null)}>
-            SHOPNGUYENTHANG.COM
-          </div>
+  <div className="min-h-screen bg-slate-100 text-slate-800">
+    {/* 1. HEADER / THANH MENU CHÍNH */}
+    <header className="bg-white shadow-sm px-4 py-3 flex justify-between items-center sticky top-0 z-50">
+      
+      {/* Logo Shop */}
+      <div 
+        className="cursor-pointer flex items-center" 
+        onClick={() => setSelectedCategory(null)}
+      >
+        <img 
+          src="/logo.png" 
+          alt="Logo Roblox Giá Rẻ" 
+          className="h-10 md:h-14 object-contain" 
+        />
+      </div>
 
-          <div className="flex items-center gap-2 md:gap-3 text-xs md:text-sm font-semibold">
-            <button
-              onClick={() => setModalType("napbank")}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 rounded-lg transition"
-            >
-              🏦 Nạp Ngân Hàng
-            </button>
-            <button
-              onClick={() => setModalType("napthe")}
-              className="bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-lg transition"
-            >
-              💳 Nạp Thẻ Cào
-            </button>
-            <button
-              onClick={() => setModalType("login")}
-              className="bg-sky-500 hover:bg-sky-600 text-white px-3 py-2 rounded-lg transition"
-            >
-              Đăng Nhập
-            </button>
-            <button
-              onClick={() => setModalType("register")}
-              className="border border-sky-500 text-sky-600 hover:bg-sky-50 px-3 py-2 rounded-lg transition hidden md:block"
-            >
-              Đăng Ký
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* Các nút bấm bên phải (Nạp tiền, Đơn hàng, v.v.) */}
+      <div className="flex items-center gap-2 md:gap-3 text-xs md:text-sm">
+        <button
+          onClick={() => setModalType("napbank")}
+          className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg font-medium"
+        >
+          Nạp Tiền
+        </button>
+      </div>
 
+    </header>
       {/* 2. MAIN CONTENT */}
       <main className="max-w-6xl mx-auto px-4 py-6">
         {/* BANNER THÔNG BÁO */}
