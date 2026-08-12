@@ -7,17 +7,16 @@ export default function Home() {
   const [customerName, setCustomerName] = useState("");
   const [accountInfo, setAccountInfo] = useState("");
   const [services, setServices] = useState<any[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("Tất cả");
   const [selectedService, setSelectedService] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   // Thông tin ngân hàng của bạn
   const BANK_ID = "MB";
-  const ACCOUNT_NO = "07908024409999"; // Thay STK của bạn
-  const ACCOUNT_NAME = "NGUYEN NGOC THANG"; // Thay tên của bạn
+  const ACCOUNT_NO = "0987654321"; // Thay bằng STK thật của bạn
+  const ACCOUNT_NAME = "NGUYEN VAN A"; // Thay bằng tên chủ TK thật
 
-  // 1. Lấy danh sách dịch vụ từ Supabase
+  // Lấy toàn bộ dịch vụ từ Supabase
   useEffect(() => {
     const fetchServices = async () => {
       const { data, error } = await supabase.from("services").select("*");
@@ -29,22 +28,7 @@ export default function Home() {
     fetchServices();
   }, []);
 
-  // 2. Lọc danh sách dịch vụ theo Danh mục được chọn
-  const filteredServices = services.filter((s) => {
-    if (selectedCategory === "Tất cả") return true;
-    return s.title.toLowerCase().includes(selectedCategory.toLowerCase());
-  });
-
-  // 3. Xử lý khi đổi Danh mục
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category);
-    const firstMatch = services.find((s) =>
-      category === "Tất cả" ? true : s.title.toLowerCase().includes(category.toLowerCase())
-    );
-    if (firstMatch) setSelectedService(firstMatch);
-  };
-
-  // 4. Xử lý tạo đơn hàng
+  // Xử lý tạo đơn hàng
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!customerName || !accountInfo || !selectedService) {
@@ -73,23 +57,12 @@ export default function Home() {
     }
   };
 
-  // Các nút Danh mục
-  const categories = [
-    "Tất cả",
-    "Level",
-    "Item",
-    "Beli",
-    "Race V4",
-    "Draco",
-    "Leviathan",
-  ];
-
   return (
     <div className="min-h-screen bg-slate-950 text-white p-4 md:p-8 flex flex-col items-center justify-center">
-      <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+      <div className="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
         <h1 className="text-2xl md:text-3xl font-extrabold mb-6 text-center text-amber-500 tracking-wide uppercase">
-  NGUYỄN THẮNG - SHOP CÀY THUÊ
-</h1>
+          NGUYỄN THẮNG - SHOP CÀY THUÊ
+        </h1>
 
         {!isSubmitted ? (
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -120,35 +93,13 @@ export default function Home() {
               />
             </div>
 
-            {/* BỘ LỌC DANH MỤC DỊCH VỤ */}
             <div>
               <label className="block text-sm font-semibold mb-2 text-slate-300">
-                1. Chọn loại dịch vụ:
+                Chọn gói dịch vụ cày thuê:
               </label>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => handleCategoryChange(cat)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                      selectedCategory === cat
-                        ? "bg-amber-500 text-slate-950"
-                        : "bg-slate-800 text-slate-300 hover:bg-slate-700"
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-
-              {/* CHỌN GÓI CỤ THỂ */}
-              <label className="block text-sm font-semibold mb-1 text-slate-300">
-                2. Chọn gói chi tiết:
-              </label>
-              {filteredServices.length === 0 ? (
+              {services.length === 0 ? (
                 <p className="text-amber-400 text-sm italic">
-                  Chưa có gói dịch vụ nào trong mục này...
+                  Đang tải toàn bộ danh sách dịch vụ...
                 </p>
               ) : (
                 <select
@@ -161,7 +112,7 @@ export default function Home() {
                   }}
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-amber-500 transition"
                 >
-                  {filteredServices.map((item) => (
+                  {services.map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.title} — {Number(item.price).toLocaleString("vi-VN")} VNĐ
                     </option>
@@ -169,6 +120,15 @@ export default function Home() {
                 </select>
               )}
             </div>
+
+            {selectedService && (
+              <div className="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 text-sm text-slate-300">
+                <p className="font-semibold text-amber-400 mb-1">
+                  Mô tả dịch vụ đã chọn:
+                </p>
+                <p>{selectedService.description || "Không có mô tả chi tiết."}</p>
+              </div>
+            )}
 
             <button
               type="submit"
