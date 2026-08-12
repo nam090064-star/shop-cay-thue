@@ -24,7 +24,7 @@ export default function Home() {
   const [accContact, setAccContact] = useState("");
   const [accPackages] = useState([
     { id: 1, title: "Acc Blox Fruits V4 Full Gear (Random Tộc)", price: 45000, desc: "Level Max + V4 Full Gear + Trái Ác Quỷ ngon" },
-    { id: 2, title: "Acc Blox Fruits V4 Full Gear (Tộc Quỷ)", price: 30000, desc: "Level Max + V4 Full Gear Tộc Quỷ + Melee Godhuman" },
+    { id: 2, title: "Acc Blox Fruits Max Level Godhuan Song Kiếm SGT", price: 30000, desc: "Level Max + V4 Full Gear Tộc Quỷ + Melee Godhuman" },
   ]);
   const [selectedAcc, setSelectedAcc] = useState<any>(accPackages[0]);
 
