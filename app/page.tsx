@@ -125,24 +125,113 @@ export default function Home() {
 />
       </div>
 
-      {/* Các nút bấm ở góc phải Header */}
+      {/* Các nút bấm góc phải Header */}
 <div className="flex items-center gap-2 md:gap-3 text-xs md:text-sm">
-  {/* Nút Đăng nhập */}
+  {/* Nút Đăng Nhập */}
   <button
     onClick={() => setModalType("login")}
-    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-medium"
+    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-medium transition"
   >
     Đăng Nhập
   </button>
 
-  {/* Nút Nạp tiền */}
+  {/* Nút Đăng Ký */}
+  <button
+    onClick={() => setModalType("register")}
+    className="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg font-medium transition"
+  >
+    Đăng Ký
+  </button>
+
+  {/* Nút Nạp Tiền */}
   <button
     onClick={() => setModalType("napbank")}
-    className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg font-medium"
+    className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg font-medium transition"
   >
     Nạp Tiền
   </button>
-</div>
+{/* ================= MODAL ĐĂNG KÝ ================= */}
+{modalType === "register" && (
+  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
+    <div className="bg-white p-6 rounded-2xl max-w-sm w-full relative shadow-2xl border border-slate-100">
+      
+      {/* Nút đóng (X) */}
+      <button 
+        onClick={() => setModalType(null)} 
+        className="absolute top-3 right-4 text-gray-400 hover:text-red-500 text-xl font-bold transition"
+      >
+        ✕
+      </button>
+
+      {/* Tiêu đề */}
+      <div className="text-center mb-5">
+        <h2 className="text-2xl font-black text-slate-800 tracking-wide uppercase">
+          Tạo Tài Khoản
+        </h2>
+        <p className="text-xs text-slate-500 mt-1">Đăng ký để bắt đầu mua sắm tại shop</p>
+      </div>
+      
+      {/* Form nhập thông tin */}
+      <form 
+        onSubmit={(e) => { 
+          e.preventDefault(); 
+          alert("Đăng ký tài khoản thành công! Vui lòng đăng nhập."); 
+          setModalType("login"); 
+        }} 
+        className="space-y-3"
+      >
+        <div>
+          <label className="text-xs font-bold text-slate-700 block mb-1">Tên tài khoản</label>
+          <input 
+            type="text" 
+            required 
+            placeholder="Nhập tên tài khoản..." 
+            className="w-full border border-slate-200 p-2.5 rounded-xl text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition" 
+          />
+        </div>
+
+        <div>
+          <label className="text-xs font-bold text-slate-700 block mb-1">Mật khẩu</label>
+          <input 
+            type="password" 
+            required 
+            placeholder="Nhập mật khẩu..." 
+            className="w-full border border-slate-200 p-2.5 rounded-xl text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition" 
+          />
+        </div>
+
+        <div>
+          <label className="text-xs font-bold text-slate-700 block mb-1">Xác nhận mật khẩu</label>
+          <input 
+            type="password" 
+            required 
+            placeholder="Nhập lại mật khẩu..." 
+            className="w-full border border-slate-200 p-2.5 rounded-xl text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition" 
+          />
+        </div>
+
+        <button 
+          type="submit" 
+          className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl text-sm shadow-md transition transform active:scale-95 mt-2"
+        >
+          Đăng Ký Ngay
+        </button>
+      </form>
+
+      {/* Chuyển sang Đăng nhập nếu đã có tài khoản */}
+      <div className="text-center mt-4 pt-3 border-t border-slate-100 text-xs text-slate-600">
+        Đã có tài khoản?{" "}
+        <button 
+          onClick={() => setModalType("login")}
+          className="text-blue-600 font-bold hover:underline"
+        >
+          Đăng nhập ngay
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}</div>
 
     </header>
       {/* 2. MAIN CONTENT */}
