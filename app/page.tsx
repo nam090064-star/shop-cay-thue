@@ -116,10 +116,10 @@ export default function Home() {
         onClick={() => setSelectedCategory(null)}
       >
         <img 
-          src="/logo.png" 
-          alt="Logo Roblox Giá Rẻ" 
-          className="h-10 md:h-14 object-contain" 
-        />
+  src="/logo.png" 
+  alt="Logo Roblox Giá Rẻ" 
+  className="h-10 md:h-14 object-contain" 
+/>
       </div>
 
       {/* Các nút bấm bên phải (Nạp tiền, Đơn hàng, v.v.) */}
