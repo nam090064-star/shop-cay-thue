@@ -2,139 +2,126 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
-
-export default function Admin() {
+export default function AdminPage() {
+  const [category, setCategory] = useState("CÀY BELI & ĐIỂM F");
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("CÀY LEVEL");
   const [services, setServices] = useState<any[]>([]);
 
-  const categories = [
-    "CÀY LEVEL",
-    "CÀY ITEM",
-    "CÀY BELI & ĐIỂM F",
-    "RACE V4",
-    "DRACO RACE",
-    "LEVIATHAN",
-  ];
-
+  // Lấy danh sách dịch vụ
   const fetchServices = async () => {
-    const { data } = await supabase.from("services").select("*");
-    if (data) setServices(data);
+    const { data, error } = await supabase.from("services").select("*").order("id", { ascending: false });
+    if (!error && data) setServices(data);
   };
 
   useEffect(() => {
     fetchServices();
   }, []);
 
-  const handleAdd = async (e: React.FormEvent) => {
+  // Hàm thêm dịch vụ mới (Tự động gán mô tả mặc định)
+  const handleAddService = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !price) return alert("Vui lòng nhập tên và giá!");
-
-    // Ghép tên danh mục vào tiêu đề hoặc lưu chuẩn
-    const fullTitle = `[${category}] ${title}`;
+    if (!title || !price) return alert("Vui lòng nhập đầy đủ thông tin!");
 
     const { error } = await supabase.from("services").insert([
-      { title: fullTitle, price: Number(price), description },
+      {
+        category: category,
+        title: title,
+        name: title,
+        price: Number(price),
+        description: "Hoàn Thành Đơn Trong Ngày", // Mặc định tự động điền
+      },
     ]);
 
-    if (error) alert("Lỗi: " + error.message);
-    else {
+    if (error) {
+      alert("Lỗi thêm dịch vụ: " + error.message);
+    } else {
       alert("Thêm dịch vụ thành công!");
       setTitle("");
       setPrice("");
-      setDescription("");
       fetchServices();
     }
   };
 
+  // Hàm xóa dịch vụ
   const handleDelete = async (id: number) => {
-    if (confirm("Bạn có chắc muốn xóa?")) {
-      await supabase.from("services").delete().eq("id", id);
-      fetchServices();
+    if (confirm("Bạn có chắc muốn xóa dịch vụ này?")) {
+      const { error } = await supabase.from("services").delete().eq("id", id);
+      if (!error) fetchServices();
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-amber-500 text-center">
-        TRANG QUẢN LÝ DỊCH VỤ (ADMIN)
+    <div className="min-h-screen bg-slate-950 text-white p-4 max-w-md mx-auto">
+      <h1 className="text-xl font-bold text-center text-amber-400 mb-6 uppercase">
+        Trang Quản Lý Dịch Vụ (Admin)
       </h1>
 
-      <form onSubmit={handleAdd} className="bg-slate-900 p-6 rounded-xl space-y-4 mb-8">
+      {/* FORM THÊM DỊCH VỤ 3 DÒNG */}
+      <form onSubmit={handleAddService} className="space-y-4 bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-lg">
+        
+        {/* Dòng 1: Chọn Danh Mục */}
         <div>
-          <label className="block text-sm font-semibold mb-1">Chọn Danh Mục:</label>
-          <select
-            value={category}
+          <label className="text-xs text-slate-400 block mb-1 font-medium">1. Chọn Danh Mục:</label>
+          <select 
+            value={category} 
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white"
+            className="w-full bg-slate-950 border border-slate-700 text-white text-xs p-2.5 rounded-lg outline-none focus:border-amber-500"
           >
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
+            <option value="CÀY BELI & ĐIỂM F">CÀY BELI & ĐIỂM F</option>
+            <option value="CÀY TỘC V4">CÀY TỘC V4</option>
+            <option value="CÀY LEVEL & MASTERY">CÀY LEVEL & MASTERY</option>
+            <option value="SĂN ITEM & RAIDS">SĂN ITEM & RAIDS</option>
           </select>
         </div>
 
+        {/* Dòng 2: Tên Dịch Vụ */}
         <div>
-          <label className="block text-sm font-semibold mb-1">Tên dịch vụ:</label>
-          <input
-            type="text"
-            placeholder="Ví dụ: Level 1 - 700"
+          <label className="text-xs text-slate-400 block mb-1 font-medium">2. Tên Dịch Vụ:</label>
+          <input 
+            type="text" 
+            required
+            placeholder="Ví dụ: Gạt Cần Tộc V4" 
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white"
+            className="w-full bg-slate-950 border border-slate-700 text-white text-xs p-2.5 rounded-lg outline-none focus:border-amber-500"
           />
         </div>
 
+        {/* Dòng 3: Giá Tiền */}
         <div>
-          <label className="block text-sm font-semibold mb-1">Giá tiền (VNĐ):</label>
-          <input
-            type="number"
-            placeholder="Ví dụ: 5000"
+          <label className="text-xs text-slate-400 block mb-1 font-medium">3. Giá Tiền (VNĐ):</label>
+          <input 
+            type="number" 
+            required
+            placeholder="Ví dụ: 30000" 
             value={price}
             onChange={(e) => setPrice(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white"
+            className="w-full bg-slate-950 border border-slate-700 text-white text-xs p-2.5 rounded-lg outline-none focus:border-amber-500"
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-semibold mb-1">Mô tả:</label>
-          <input
-            type="text"
-            placeholder="Ví dụ: Hoàn thành trong ngày"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white"
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="w-full bg-amber-600 hover:bg-amber-500 font-bold py-3 rounded-lg"
+        {/* Nút Thêm */}
+        <button 
+          type="submit" 
+          className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs py-2.5 rounded-lg transition uppercase tracking-wide"
         >
-          THÊM DỊCH VỤ
+          Thêm Dịch Vụ
         </button>
       </form>
 
-      <h2 className="text-lg font-bold mb-4">Danh Sách Dịch Vụ Hiện Có:</h2>
-      <div className="space-y-2">
+      {/* DANH SÁCH DỊCH VỤ HIỆN CÓ */}
+      <div className="mt-8 space-y-2">
+        <h2 className="text-xs font-bold text-slate-400 uppercase mb-3">Danh Sách Dịch Vụ Hiện Có:</h2>
         {services.map((item) => (
-          <div
-            key={item.id}
-            className="bg-slate-900 p-3 rounded-lg flex justify-between items-center"
-          >
+          <div key={item.id} className="bg-slate-900 p-3 rounded-lg border border-slate-800 flex justify-between items-center text-xs">
             <div>
-              <p className="font-semibold text-amber-400">{item.title}</p>
-              <p className="text-sm text-slate-400">
-                {Number(item.price).toLocaleString("vi-VN")} VNĐ
-              </p>
+              <p className="font-bold text-white">{item.title || item.name}</p>
+              <p className="text-amber-400 font-semibold">{item.price?.toLocaleString()} VNĐ</p>
             </div>
-            <button
+            <button 
               onClick={() => handleDelete(item.id)}
-              className="bg-red-600 px-3 py-1 rounded text-sm hover:bg-red-500"
+              className="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-2.5 py-1 rounded transition text-[10px]"
             >
               Xóa
             </button>
