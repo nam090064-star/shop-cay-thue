@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
+
 export default function AdminPage() {
-  const [category, setCategory] = useState("CÀY BELI & ĐIỂM F");
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [services, setServices] = useState<any[]>([]);
@@ -18,18 +18,18 @@ export default function AdminPage() {
     fetchServices();
   }, []);
 
-  // Hàm thêm dịch vụ mới (Tự động gán mô tả mặc định)
+  // Hàm thêm dịch vụ mới (Tự động gán Danh mục & Mô tả mặc định)
   const handleAddService = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !price) return alert("Vui lòng nhập đầy đủ thông tin!");
 
     const { error } = await supabase.from("services").insert([
       {
-        category: category,
+        category: "TẤT CẢ DỊCH VỤ", // Mặc định chung danh mục
         title: title,
         name: title,
         price: Number(price),
-        description: "Hoàn Thành Đơn Trong Ngày", // Mặc định tự động điền
+        description: "Hoàn Thành Đơn Trong Ngày", // Mặc định mô tả
       },
     ]);
 
@@ -57,27 +57,12 @@ export default function AdminPage() {
         Trang Quản Lý Dịch Vụ (Admin)
       </h1>
 
-      {/* FORM THÊM DỊCH VỤ 3 DÒNG */}
+      {/* FORM THÊM DỊCH VỤ 2 DÒNG */}
       <form onSubmit={handleAddService} className="space-y-4 bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-lg">
         
-        {/* Dòng 1: Chọn Danh Mục */}
+        {/* Dòng 1: Tên Dịch Vụ */}
         <div>
-          <label className="text-xs text-slate-400 block mb-1 font-medium">1. Chọn Danh Mục:</label>
-          <select 
-            value={category} 
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-700 text-white text-xs p-2.5 rounded-lg outline-none focus:border-amber-500"
-          >
-            <option value="CÀY BELI & ĐIỂM F">CÀY BELI & ĐIỂM F</option>
-            <option value="CÀY TỘC V4">CÀY TỘC V4</option>
-            <option value="CÀY LEVEL & MASTERY">CÀY LEVEL & MASTERY</option>
-            <option value="SĂN ITEM & RAIDS">SĂN ITEM & RAIDS</option>
-          </select>
-        </div>
-
-        {/* Dòng 2: Tên Dịch Vụ */}
-        <div>
-          <label className="text-xs text-slate-400 block mb-1 font-medium">2. Tên Dịch Vụ:</label>
+          <label className="text-xs text-slate-400 block mb-1 font-medium">1. Tên Dịch Vụ:</label>
           <input 
             type="text" 
             required
@@ -88,9 +73,9 @@ export default function AdminPage() {
           />
         </div>
 
-        {/* Dòng 3: Giá Tiền */}
+        {/* Dòng 2: Giá Tiền */}
         <div>
-          <label className="text-xs text-slate-400 block mb-1 font-medium">3. Giá Tiền (VNĐ):</label>
+          <label className="text-xs text-slate-400 block mb-1 font-medium">2. Giá Tiền (VNĐ):</label>
           <input 
             type="number" 
             required
