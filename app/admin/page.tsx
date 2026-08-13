@@ -65,15 +65,16 @@ export default function AdminPage() {
         <div>
           <label className="text-xs text-slate-400 block mb-1 font-medium">Chọn Danh Mục:</label>
           <select 
-            value={category} 
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-700 text-white text-xs p-2.5 rounded-lg outline-none focus:border-amber-500"
-          >
-            <option value="CÀY BELI & ĐIỂM F">CÀY BELI & ĐIỂM F</option>
-            <option value="CÀY TỘC V4">CÀY TỘC V4</option>
-            <option value="CÀY LEVEL & MASTERY">CÀY LEVEL & MASTERY</option>
-            <option value="SĂN ITEM & RAIDS">SĂN ITEM & RAIDS</option>
-          </select>
+  value={category} 
+  onChange={(e) => setCategory(e.target.value)}
+  className="w-full bg-slate-950 border border-slate-700 text-white text-xs p-2.5 rounded-lg outline-none focus:border-amber-500"
+>
+  <option value="CÀY LEVEL">CÀY LEVEL</option>
+  <option value="CÀY BELI & ĐIỂM F">CÀY BELI & ĐIỂM F</option>
+  <option value="CÀY TỘC V4">CÀY TỘC V4</option>
+  <option value="CÀY MASTERY">CÀY MASTERY</option>
+  <option value="SĂN ITEM & RAIDS">SĂN ITEM & RAIDS</option>
+</select>
         </div>
 
         {/* Dòng 2: Tên Dịch Vụ */}
