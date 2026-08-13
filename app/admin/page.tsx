@@ -28,7 +28,6 @@ export default function AdminPage() {
     const { error } = await supabase.from("services").insert([
       {
         title: title,
-        name: title,
         price: Number(price),
         description: description || "Hoàn Thành Đơn Trong Ngày",
       },
