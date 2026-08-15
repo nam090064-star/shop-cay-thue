@@ -4,34 +4,34 @@ import { useState, useEffect } from "react";
 import { supabase } from "./lib/supabase";
 
 // ==========================================
-// KHO DỮ LIỆU TRỐNG - ĐANG CHỜ BẠN THÊM MỚI
+// KHO GÓI CÀY THUÊ (Bạn có thể thêm/sửa gói ở đây)
 // ==========================================
-const CAY_THUE_SERVICES: any[] = [
-  // Bạn sẽ thêm các gói cày thuê vào đây sau
+const CAY_THUE_SERVICES = [
+  { id: "1", name: "Cày Level 1 - 2550 (Max Level)", price: 50000 },
+  { id: "2", name: "Lấy Tộc V4 (Full Gear)", price: 150000 },
+  { id: "3", name: "Săn Cursed Dual Katana (CDK)", price: 100000 },
+  { id: "4", name: "Săn Melee Godhuman", price: 120000 },
+  { id: "5", name: "Farm 10.000.000 Beli", price: 30000 },
 ];
 
-const ACC_SERVICES: any[] = [
-  // Bạn sẽ thêm các gói acc vào đây sau
-];
+const ACC_SERVICES: any[] = [];
 
 export default function Home() {
-  const [modalType, setModalType] = useState<"login" | "register" | "order_caythue" | "buy_acc" | "nap_tien" | null>(null);
+  const [modalType, setModalType] = useState<"login" | "register" | "nap_tien" | null>(null);
   const [activeTab, setActiveTab] = useState<"all" | "caythue" | "shopacc">("all");
 
-  const [selectedService, setSelectedService] = useState<any>(null);
-  const [selectedAcc, setSelectedAcc] = useState<any>(null);
-
-  // Form Cày thuê (Acc Roblox của khách)
+  // Form Cày Thuê
+  const [selectedServiceId, setSelectedServiceId] = useState<string>("");
   const [robloxUsername, setRobloxUsername] = useState("");
   const [robloxPassword, setRobloxPassword] = useState("");
+  const [twoFactorOrCookie, setTwoFactorOrCookie] = useState("");
   const [note, setNote] = useState("");
 
-  // State Auth
+  // State Auth & User
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
   const [user, setUser] = useState<any>(null);
   const [balance, setBalance] = useState<number>(0);
 
@@ -123,24 +123,32 @@ export default function Home() {
     alert("Đã đăng xuất thành công!");
   };
 
-  const handleOrderCayThue = async (e: React.FormEvent) => {
+  // Xử lý submit đơn cày thuê
+  const handleCreateOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      alert("Vui lòng đăng nhập để đặt dịch vụ!");
+      alert("Vui lòng đăng nhập để tạo đơn hàng!");
       setModalType("login");
       return;
     }
-    alert(`🎉 Đặt đơn "${selectedService?.name}" thành công! Shop sẽ xử lý trong 24h.`);
-    setModalType(null);
+    if (!selectedServiceId) {
+      alert("Vui lòng chọn 1 gói dịch vụ!");
+      return;
+    }
+
+    const currentService = CAY_THUE_SERVICES.find((s) => s.id === selectedServiceId);
+
+    alert(`🎉 Tạo đơn thành công!\n- Dịch vụ: ${currentService?.name}\n- Giá: ${currentService?.price.toLocaleString("vi-VN")}đ\nShop sẽ xử lý trong 24h!`);
+
+    // Reset form
     setRobloxUsername("");
     setRobloxPassword("");
+    setTwoFactorOrCookie("");
     setNote("");
+    setSelectedServiceId("");
   };
 
-  const confirmBuyAcc = () => {
-    alert(`🎉 Mua ${selectedAcc?.title} thành công! Thông tin acc đã được gửi.`);
-    setModalType(null);
-  };
+  const selectedService = CAY_THUE_SERVICES.find((s) => s.id === selectedServiceId);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
@@ -150,7 +158,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => setActiveTab("all")}>
             <div className="bg-gradient-to-r from-sky-400 to-blue-600 text-white font-black text-xl px-3 py-1 rounded-xl shadow-md tracking-wider">
-              RobloxGiaRe.Com
+              MYSHOP.COM
             </div>
           </div>
 
@@ -193,170 +201,242 @@ export default function Home() {
         </div>
       </header>
 
-      {/* BANNER */}
-      <div className="max-w-6xl mx-auto px-4 pt-6 pb-2">
-        <div className="rounded-2xl overflow-hidden shadow-lg border-2 border-sky-200 mb-6 bg-slate-900 relative">
-          <img 
-            src="https://rpgstash-blog.s3.amazonaws.com/Image_2025-01-23_Dragon1.png" 
-            alt="Banner Shop" 
-            className="w-full h-48 md:h-72 object-cover opacity-85"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-6">
-            <span className="bg-sky-500 text-white font-black text-sm md:text-xl px-4 py-2 rounded-xl shadow-lg border border-sky-300">
-              ⚡ SHOP GAME DUYỆT ĐƠN SIÊU TỐC - UY TÍN 100%
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <main className="max-w-6xl mx-auto px-4 pb-12">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl md:text-3xl font-black text-sky-600 mb-2 uppercase tracking-wide">
-            DANH MỤC DỊCH VỤ BLOX FRUITS
-          </h2>
-          <p className="text-slate-500 text-xs md:text-sm">Chọn dịch vụ bạn cần bên dưới</p>
-        </div>
-
-        {/* 2 KHUNG DANH MỤC TRANG CHỦ */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          {/* MỤC 1: CÀY THUÊ BLOX FRUITS */}
-          <div 
-            onClick={() => { setActiveTab("caythue"); document.getElementById("cay-thue-section")?.scrollIntoView({ behavior: "smooth" }); }}
-            className="bg-sky-50/60 border-2 border-sky-200 rounded-3xl p-5 shadow-md flex flex-col items-center text-center cursor-pointer hover:shadow-xl hover:scale-[1.01] transition duration-300"
+      {/* MAIN CONTAINER */}
+      <main className="max-w-4xl mx-auto px-4 py-8">
+        
+        {/* NÚT QUAY LẠI TRANG CHỦ (Nếu đang lọc tab) */}
+        {activeTab !== "all" && (
+          <button
+            onClick={() => setActiveTab("all")}
+            className="mb-4 text-xs font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 bg-white px-3 py-1.5 rounded-xl border border-sky-200 shadow-sm"
           >
-            <div className="w-full h-48 rounded-2xl overflow-hidden mb-4 border border-sky-200 shadow-inner">
-              <img 
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRT0Ly8DLwNKc5s7LR5ibSeVeXEX6qX0IC_3fZC1S7Pmg&s=10" 
-                alt="Cày Thuê Blox Fruits" 
-                className="w-full h-full object-cover"
-              />
+            &larr; Quay lại danh mục chính
+          </button>
+        )}
+
+        {/* ========================================== */}
+        {/* TRANG CHỦ: DANH MỤC BAN ĐẦU */}
+        {/* ========================================== */}
+        {activeTab === "all" && (
+          <div>
+            <div className="text-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-black text-sky-600 mb-2 uppercase tracking-wide">
+                DANH MỤC DỊCH VỤ BLOX FRUITS
+              </h2>
+              <p className="text-slate-500 text-xs md:text-sm">Chọn dịch vụ bạn cần bên dưới</p>
             </div>
-            <h3 className="font-extrabold text-xl text-sky-600 mb-2 uppercase tracking-wide">
-              CÀY THUÊ BLOX-FRUITS
-            </h3>
-            <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-4 py-1 rounded-full mb-4 border border-emerald-300">
-              Cày Thuê Giá Rẻ
-            </span>
-            <button
-              onClick={(e) => { e.stopPropagation(); setActiveTab("caythue"); document.getElementById("cay-thue-section")?.scrollIntoView({ behavior: "smooth" }); }}
-              className="w-full py-3 bg-sky-400 hover:bg-sky-500 text-white font-black rounded-2xl text-base shadow-md transition flex items-center justify-center gap-2"
-            >
-              XEM TẤT CẢ &rarr;
-            </button>
-          </div>
 
-          {/* MỤC 2: ACC BLOX FRUITS TỔNG HỢP */}
-          <div 
-            onClick={() => { setActiveTab("shopacc"); document.getElementById("shop-acc-section")?.scrollIntoView({ behavior: "smooth" }); }}
-            className="bg-sky-50/60 border-2 border-sky-200 rounded-3xl p-5 shadow-md flex flex-col items-center text-center cursor-pointer hover:shadow-xl hover:scale-[1.01] transition duration-300"
-          >
-            <div className="w-full h-48 rounded-2xl overflow-hidden mb-4 border border-sky-200 shadow-inner">
-              <img 
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkOt5op8NbTeM89SSNJiJAhfNTE9Wle5rCXddf0NfuPw&s=10" 
-                alt="Acc Blox Fruits Tổng Hợp" 
-                className="w-full h-full object-cover"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              {/* CARD CÀY THUÊ */}
+              <div 
+                onClick={() => setActiveTab("caythue")}
+                className="bg-sky-50/60 border-2 border-sky-200 rounded-3xl p-5 shadow-md flex flex-col items-center text-center cursor-pointer hover:shadow-xl hover:scale-[1.01] transition duration-300"
+              >
+                <div className="w-full h-48 rounded-2xl overflow-hidden mb-4 border border-sky-200 shadow-inner">
+                  <img 
+                    src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500" 
+                    alt="Cày Thuê Blox Fruits" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="font-extrabold text-xl text-sky-600 mb-2 uppercase tracking-wide">
+                  CÀY THUÊ BLOX-FRUITS
+                </h3>
+                <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-4 py-1 rounded-full mb-4 border border-emerald-300">
+                  Cày Thuê Giá Rẻ
+                </span>
+                <button className="w-full py-3 bg-sky-400 hover:bg-sky-500 text-white font-black rounded-2xl text-base shadow-md transition">
+                  XEM TẤT CẢ &rarr;
+                </button>
+              </div>
+
+              {/* CARD SHOP ACC */}
+              <div 
+                onClick={() => setActiveTab("shopacc")}
+                className="bg-sky-50/60 border-2 border-sky-200 rounded-3xl p-5 shadow-md flex flex-col items-center text-center cursor-pointer hover:shadow-xl hover:scale-[1.01] transition duration-300"
+              >
+                <div className="w-full h-48 rounded-2xl overflow-hidden mb-4 border border-sky-200 shadow-inner">
+                  <img 
+                    src="https://images.unsplash.com/photo-1560253023-3ec5d502959f?w=500" 
+                    alt="Acc Blox Fruits Tổng Hợp" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="font-extrabold text-xl text-sky-600 mb-2 uppercase tracking-wide">
+                  ACC BLOX-FRUITS TỔNG HỢP
+                </h3>
+                <span className="bg-sky-100 text-rose-600 text-xs font-bold px-4 py-1 rounded-full mb-4 border border-sky-300">
+                  Sẵn Sàng
+                </span>
+                <button className="w-full py-3 bg-sky-400 hover:bg-sky-500 text-white font-black rounded-2xl text-base shadow-md transition">
+                  XEM TẤT CẢ &rarr;
+                </button>
+              </div>
+
             </div>
-            <h3 className="font-extrabold text-xl text-sky-600 mb-2 uppercase tracking-wide">
-              ACC BLOX-FRUITS TỔNG HỢP
-            </h3>
-            <span className="bg-sky-100 text-rose-600 text-xs font-bold px-4 py-1 rounded-full mb-4 border border-sky-300">
-              Sẵn Sàng
-            </span>
-            <button
-              onClick={(e) => { e.stopPropagation(); setActiveTab("shopacc"); document.getElementById("shop-acc-section")?.scrollIntoView({ behavior: "smooth" }); }}
-              className="w-full py-3 bg-sky-400 hover:bg-sky-500 text-white font-black rounded-2xl text-base shadow-md transition flex items-center justify-center gap-2"
-            >
-              XEM TẤT CẢ &rarr;
-            </button>
-          </div>
-
-        </div>
-
-        {/* KHU VỰC CÀY THUÊ */}
-        {(activeTab === "caythue" || activeTab === "all") && (
-          <div id="cay-thue-section" className="mt-12 pt-4">
-            <h3 className="text-xl font-extrabold text-sky-600 mb-4 pb-2 border-b-2 border-sky-100 uppercase">
-              ⚡ GÓI CÀY THUÊ BLOX FRUITS
-            </h3>
-
-            {CAY_THUE_SERVICES.length === 0 ? (
-              <div className="bg-white border-2 border-dashed border-sky-200 p-8 rounded-2xl text-center text-slate-400">
-                Chưa có dịch vụ cày thuê nào. Hãy gửi thông tin dịch vụ để chúng ta cùng thêm vào!
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {CAY_THUE_SERVICES.map((s) => (
-                  <div key={s.id} className="bg-white border-2 border-sky-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between">
-                    <div>
-                      <img src={s.image} alt={s.name} className="h-36 w-full object-cover rounded-xl mb-3" />
-                      <h4 className="font-extrabold text-base text-slate-800 mb-1">{s.name}</h4>
-                      <p className="text-xs text-slate-500 mb-2">{s.desc}</p>
-                    </div>
-                    <div className="mt-3">
-                      <p className="text-sky-600 font-black text-lg mb-3">{s.price.toLocaleString("vi-VN")} VNĐ</p>
-                      <button
-                        onClick={() => { 
-                          setSelectedService(s); 
-                          setModalType("order_caythue"); 
-                        }}
-                        className="w-full py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl text-sm transition shadow-md flex items-center justify-center gap-1"
-                      >
-                        📝 Đặt Đơn Ngay
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         )}
 
-        {/* KHU VỰC ACC BLOX FRUITS */}
-        {(activeTab === "shopacc" || activeTab === "all") && (
-          <div id="shop-acc-section" className="mt-12 pt-4">
-            <h3 className="text-xl font-extrabold text-sky-600 mb-4 pb-2 border-b-2 border-sky-100 uppercase">
-              🛒 KHO ACC BLOX FRUITS TỔNG HỢP
-            </h3>
+        {/* ========================================== */}
+        {/* GIAO DIỆN FORM ĐẶT CÀY THUÊ (MỤC CÀY THUÊ) */}
+        {/* ========================================== */}
+        {activeTab === "caythue" && (
+          <div className="space-y-6">
+            
+            {/* TIÊU ĐỀ HỆ THỐNG */}
+            <div className="text-center mb-6">
+              <h1 className="text-2xl md:text-3xl font-black text-sky-600 tracking-wide uppercase">
+                Dịch Vụ - CÀY THUÊ BLOX-FRUITS
+              </h1>
+              <div className="w-16 h-1 bg-sky-400 mx-auto mt-2 rounded-full"></div>
+            </div>
 
-            {ACC_SERVICES.length === 0 ? (
-              <div className="bg-white border-2 border-dashed border-sky-200 p-8 rounded-2xl text-center text-slate-400">
-                Chưa có acc nào trong kho. Hãy gửi thông tin acc để chúng ta cùng thêm vào!
+            {/* BẢNG LƯU Ý KHI CÀY THUÊ */}
+            <div className="bg-amber-50 border-2 border-amber-200 rounded-3xl p-4 md:p-5 text-amber-900 text-xs md:text-sm space-y-2 shadow-sm">
+              <h4 className="font-extrabold text-amber-800 text-base flex items-center gap-2">
+                ⚠️ LƯU Ý QUAN TRỌNG KHI CÀY THUÊ:
+              </h4>
+              <ul className="list-disc pl-5 space-y-1 text-amber-800/90 font-medium">
+                <li><b>Vui lòng tắt xác minh 2 bước (2FA)</b> hoặc cung cấp <b>Mã dự phòng</b> để Admin vào cày nhanh nhất.</li>
+                <li>Không đăng nhập vào Nick Roblox trong lúc Admin đang thực hiện đơn cày thuê.</li>
+                <li>Đổi mật khẩu ngay sau khi đơn hàng báo <b>Hoàn thành</b> để đảm bảo an toàn tuyệt đối.</li>
+              </ul>
+            </div>
+
+            {/* FORM ĐẶT ĐƠN HÀNG */}
+            <form onSubmit={handleCreateOrder} className="space-y-6">
+              
+              {/* BƯỚC 1: CHỌN GÓI DỊCH VỤ */}
+              <div className="bg-white border-2 border-sky-100 rounded-3xl p-5 shadow-sm space-y-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-7 h-7 bg-sky-500 text-white rounded-full flex items-center justify-center font-black text-sm shadow-sm">
+                    1
+                  </span>
+                  <h3 className="font-extrabold text-base text-slate-800">Chọn Gói Dịch Vụ</h3>
+                </div>
+
+                <select
+                  value={selectedServiceId}
+                  onChange={(e) => setSelectedServiceId(e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-sky-500 text-slate-700 font-medium"
+                >
+                  <option value="">-- Tìm và chọn gói dịch vụ... --</option>
+                  {CAY_THUE_SERVICES.map((service) => (
+                    <option key={service.id} value={service.id}>
+                      {service.name} - ({service.price.toLocaleString("vi-VN")} VNĐ)
+                    </option>
+                  ))}
+                </select>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-5">
-                {ACC_SERVICES.map((acc) => (
-                  <div key={acc.id} className="bg-white border-2 border-sky-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between">
-                    <div>
-                      <img src={acc.image} alt={acc.title} className="h-40 w-full object-cover rounded-xl mb-3" />
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="bg-sky-100 text-sky-700 text-xs font-bold px-2.5 py-0.5 rounded-md">{acc.code}</span>
-                      </div>
-                      <h4 className="font-extrabold text-base text-slate-800 mb-1">{acc.title}</h4>
-                      <p className="text-xs text-slate-500 mb-2">{acc.desc}</p>
-                    </div>
-                    <div className="mt-2">
-                      <p className="text-emerald-600 font-black text-lg mb-3">{acc.price.toLocaleString("vi-VN")} VNĐ</p>
-                      <button
-                        onClick={() => {
-                          if (!user) { alert("Vui lòng đăng nhập để mua acc!"); setModalType("login"); return; }
-                          setSelectedAcc(acc); setModalType("buy_acc");
-                        }}
-                        className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-sm transition shadow-md flex items-center justify-center gap-1"
-                      >
-                        🛒 Mua Ngay
-                      </button>
-                    </div>
+
+              {/* BƯỚC 2: THÔNG TIN TÀI KHOẢN */}
+              <div className="bg-white border-2 border-sky-100 rounded-3xl p-5 shadow-sm space-y-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-7 h-7 bg-sky-500 text-white rounded-full flex items-center justify-center font-black text-sm shadow-sm">
+                    2
+                  </span>
+                  <h3 className="font-extrabold text-base text-slate-800">Thông Tin Tài Khoản</h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-600 mb-1.5">Tài Khoản (*)</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Nhập tài khoản cần cày"
+                      value={robloxUsername}
+                      onChange={(e) => setRobloxUsername(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-sky-500"
+                    />
                   </div>
-                ))}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-600 mb-1.5">Mật Khẩu (*)</label>
+                    <input
+                      type="password"
+                      required
+                      placeholder="Nhập mật khẩu của tài khoản đó"
+                      value={robloxPassword}
+                      onChange={(e) => setRobloxPassword(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-sky-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Cookie / 2FA / Mã Dự Phòng</label>
+                  <input
+                    type="text"
+                    placeholder="Có thể nhập chuỗi 2FA, mã dự phòng hoặc cookie liên quan"
+                    value={twoFactorOrCookie}
+                    onChange={(e) => setTwoFactorOrCookie(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-sky-500"
+                  />
+                  <p className="text-[11px] text-slate-400 mt-1">ⓘ Dữ liệu này không bắt buộc, có thể bỏ trống nếu đã tắt 2FA.</p>
+                </div>
               </div>
-            )}
+
+              {/* BƯỚC 3: GHI CHÚ & XÁC NHẬN */}
+              <div className="bg-white border-2 border-sky-100 rounded-3xl p-5 shadow-sm space-y-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-7 h-7 bg-sky-500 text-white rounded-full flex items-center justify-center font-black text-sm shadow-sm">
+                    3
+                  </span>
+                  <h3 className="font-extrabold text-base text-slate-800">Ghi Chú & Xác Nhận</h3>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Ghi Chú Cho Admin</label>
+                  <textarea
+                    rows={3}
+                    maxLength={500}
+                    placeholder="Nhập ghi chú cho admin nếu có..."
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-sky-500"
+                  />
+                  <div className="text-right text-[11px] text-slate-400 mt-1">
+                    {note.length} / 500
+                  </div>
+                </div>
+
+                <div className="pt-2 text-center">
+                  {selectedService ? (
+                    <button
+                      type="submit"
+                      className="w-full md:w-auto px-8 py-3.5 bg-sky-500 hover:bg-sky-600 text-white font-extrabold rounded-2xl text-base shadow-md transition flex items-center justify-center gap-2 mx-auto"
+                    >
+                      🛒 Tạo Đơn Hàng ({selectedService.price.toLocaleString("vi-VN")} VNĐ)
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled
+                      className="w-full md:w-auto px-8 py-3.5 bg-slate-200 text-slate-400 font-extrabold rounded-2xl text-base cursor-not-allowed mx-auto"
+                    >
+                      Vui lòng chọn gói dịch vụ
+                    </button>
+                  )}
+                </div>
+              </div>
+
+            </form>
           </div>
         )}
+
+        {/* ========================================== */}
+        {/* KHO ACC BLOX FRUITS */}
+        {/* ========================================== */}
+        {activeTab === "shopacc" && (
+          <div className="bg-white border-2 border-dashed border-sky-200 p-8 rounded-3xl text-center text-slate-400">
+            Kho Acc đang chuẩn bị cập nhật...
+          </div>
+        )}
+
       </main>
 
-      {/* MODALS HỘP THOẠI NỔI */}
+      {/* MODALS HỘP THOẠI NỔI (ĐĂNG NHẬP / ĐĂNG KÝ / NẠP TIỀN) */}
       {modalType && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white border border-sky-100 w-full max-w-md rounded-3xl p-6 relative shadow-2xl">
@@ -454,75 +534,6 @@ export default function Home() {
                     Đăng nhập
                   </button>
                 </p>
-              </div>
-            )}
-
-            {/* FORM ĐẶT ĐƠN CÀY THUÊ */}
-            {modalType === "order_caythue" && selectedService && (
-              <div>
-                <h2 className="text-lg font-extrabold mb-1 text-center text-sky-600 uppercase">ĐẶT ĐƠN CÀY THUÊ</h2>
-                <div className="bg-sky-50 border border-sky-100 p-2.5 rounded-xl mb-3 text-center">
-                  <p className="font-bold text-slate-700 text-sm">{selectedService.name}</p>
-                  <p className="text-sky-600 font-black text-base">{selectedService.price.toLocaleString("vi-VN")} VNĐ</p>
-                </div>
-
-                <form onSubmit={handleOrderCayThue} className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-semibold mb-1 text-slate-600">Tài Khoản Roblox (*)</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Nhập nick Roblox"
-                      value={robloxUsername}
-                      onChange={(e) => setRobloxUsername(e.target.value)}
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-sky-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold mb-1 text-slate-600">Mật Khẩu Roblox (*)</label>
-                    <input
-                      type="password"
-                      required
-                      placeholder="Nhập pass Roblox"
-                      value={robloxPassword}
-                      onChange={(e) => setRobloxPassword(e.target.value)}
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-sky-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold mb-1 text-slate-600">Ghi chú (Tắt 2FA hoặc nhập Mã dự phòng)</label>
-                    <textarea
-                      placeholder="Ví dụ: Đã tắt xác minh 2 bước..."
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-sky-500 h-16"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full py-3 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl text-sm transition shadow-md"
-                  >
-                    Xác Nhận Đặt Đơn
-                  </button>
-                </form>
-              </div>
-            )}
-
-            {/* MODAL MUA ACC */}
-            {modalType === "buy_acc" && selectedAcc && (
-              <div>
-                <h2 className="text-lg font-extrabold mb-2 text-center text-sky-600 uppercase">XÁC NHẬN MUA ACC</h2>
-                <div className="bg-sky-50 border border-sky-100 p-3 rounded-xl mb-4 text-xs space-y-1">
-                  <p>Mã Nick: <b className="text-sky-700">{selectedAcc.code}</b></p>
-                  <p>Tên Acc: <b>{selectedAcc.title}</b></p>
-                  <p>Giá tiền: <b className="text-emerald-600 text-sm">{selectedAcc.price.toLocaleString("vi-VN")}đ</b></p>
-                </div>
-                <button
-                  onClick={confirmBuyAcc}
-                  className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-sm transition shadow-md"
-                >
-                  Xác Nhận Mua
-                </button>
               </div>
             )}
 
