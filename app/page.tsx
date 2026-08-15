@@ -315,6 +315,7 @@ export default function Home() {
                     <input
                       type="text"
                       required
+                      autoComplete="off"
                       placeholder="Nhập tài khoản cần cày"
                       value={robloxUsername}
                       onChange={(e) => setRobloxUsername(e.target.value)}
@@ -326,6 +327,7 @@ export default function Home() {
                     <input
                       type="password"
                       required
+                      autoComplete="new-password"
                       placeholder="Nhập mật khẩu của tài khoản đó"
                       value={robloxPassword}
                       onChange={(e) => setRobloxPassword(e.target.value)}
