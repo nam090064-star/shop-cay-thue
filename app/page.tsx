@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-// Import supabase - nếu dòng dưới báo đỏ bạn chỉ cần đổi tên file/đường dẫn lại chút nhé
-import { supabase } from "@/lib/supabase"; 
+import { supabase } from "./lib/supabase";
 
 export default function Home() {
-  const [modalType, setModalType] = useState<"login" | "register" | "napbank" | null>(null);
+  const [modalType, setModalType] = useState<"login" | "register" | null>(null);
   
-  // State Form Auth (Chỉ dùng Username và Password)
+  // State Form Auth
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,7 +34,6 @@ export default function Home() {
     };
   }, []);
 
-  // Tạo email ảo theo username để Supabase Auth chấp nhận (vì Supabase Auth bắt buộc có email)
   const getFakeEmail = (uname: string) => `${uname.trim().toLowerCase()}@shop.com`;
 
   // 1. XỬ LÝ ĐĂNG KÝ
@@ -47,7 +45,6 @@ export default function Home() {
     const fakeEmail = getFakeEmail(username);
 
     try {
-      // Đăng ký trên Supabase Auth
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: fakeEmail,
         password: password,
@@ -59,7 +56,6 @@ export default function Home() {
       if (signUpError) throw signUpError;
 
       if (data.user) {
-        // Lưu thông tin vào bảng profiles
         await supabase.from("profiles").upsert([
           {
             id: data.user.id,
@@ -127,12 +123,6 @@ export default function Home() {
                   Chào, <b className="text-amber-400">{user.user_metadata?.username || username}</b>
                 </span>
                 <button
-                  onClick={() => setModalType("napbank")}
-                  className="bg-emerald-600 hover:bg-emerald-500 px-3 py-1.5 rounded-lg font-semibold"
-                >
-                  Nạp Tiền
-                </button>
-                <button
                   onClick={handleLogout}
                   className="bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-lg font-semibold"
                 >
@@ -165,11 +155,10 @@ export default function Home() {
         <p className="text-center text-slate-400">Vui lòng đăng ký/đăng nhập để trải nghiệm dịch vụ.</p>
       </main>
 
-      {/* MODAL CỬA SỔ NỔI: ĐĂNG NHẬP / ĐĂNG KÝ */}
+      {/* MODAL ĐĂNG NHẬP / ĐĂNG KÝ */}
       {modalType && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 relative shadow-2xl">
-            {/* Nút đóng X */}
             <button
               onClick={() => setModalType(null)}
               className="absolute top-4 right-4 text-slate-400 hover:text-white text-xl"
@@ -259,7 +248,7 @@ export default function Home() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 font-bold rounded-lg text-sm text-black transition mt-2"
+                    className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 font-bold rounded-lg text-sm text-black transition mt-2 cursor-pointer"
                   >
                     {loading ? "Đang tạo tài khoản..." : "Tạo Tài Khoản"}
                   </button>
