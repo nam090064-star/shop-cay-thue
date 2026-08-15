@@ -15,7 +15,7 @@ const CAY_THUE_SERVICES = [
 export default function Home() {
   const [modalType, setModalType] = useState<"login" | "register" | "nap_tien" | null>(null);
   const [activeTab, setActiveTab] = useState<"all" | "caythue" | "shopacc">("all");
-
+  const [isPlaying, setIsPlaying] = useState(false); 
   // State Form Cày Thuê
   const [selectedServiceId, setSelectedServiceId] = useState("");
   const [robloxUsername, setRobloxUsername] = useState("");
@@ -138,10 +138,31 @@ export default function Home() {
   };
 
   const selectedService = CAY_THUE_SERVICES.find((s) => s.id === selectedServiceId);
-
+  const toggleMusic = () => {
+  const audio = document.getElementById("bg-audio") as HTMLAudioElement;
+  if (audio) {
+    if (isPlaying) {
+      audio.pause();
+    } else {
+      audio.play();
+    }
+    setIsPlaying(!isPlaying);
+  }
+};
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
-      
+      {/* THẺ PHÁT NHẠC NỀN */}
+      <audio id="bg-audio" loop src="/nhachill.mp3" />
+
+      {/* NÚT BẬT/TẮT NHẠC NỔI GÓC DƯỚI BÊN TRÁI */}
+      <button
+        onClick={toggleMusic}
+        className="fixed bottom-5 left-5 z-50 bg-white/90 backdrop-blur-sm border-2 border-sky-300 p-3 rounded-full shadow-lg hover:scale-110 transition flex items-center justify-center gap-2 text-xs font-bold text-sky-600"
+        title="Bật/Tắt Nhạc Nền"
+      >
+        {isPlaying ? "🎵 🔊 Đang phát nhạc" : "🎵 🔇 Bật nhạc nền"}
+      </button>
+
       {/* HEADER */}
       <header className="bg-white border-b border-sky-100 sticky top-0 z-40 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -150,7 +171,6 @@ export default function Home() {
               RobloxGiaRe.Com
             </div>
           </div>
-
           <div className="flex items-center gap-2 md:gap-3 text-xs md:text-sm">
             {user ? (
               <>
