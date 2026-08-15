@@ -197,7 +197,7 @@ export default function Home() {
       <div className="max-w-6xl mx-auto px-4 pt-6 pb-2">
         <div className="rounded-2xl overflow-hidden shadow-lg border-2 border-sky-200 mb-6 bg-slate-900 relative">
           <img 
-            src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&h=450&fit=crop" 
+            src="https://rpgstash-blog.s3.amazonaws.com/Image_2025-01-23_Dragon1.png" 
             alt="Banner Shop" 
             className="w-full h-48 md:h-72 object-cover opacity-85"
           />
@@ -227,7 +227,7 @@ export default function Home() {
           >
             <div className="w-full h-48 rounded-2xl overflow-hidden mb-4 border border-sky-200 shadow-inner">
               <img 
-                src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500" 
+                src="" 
                 alt="Cày Thuê Blox Fruits" 
                 className="w-full h-full object-cover"
               />
