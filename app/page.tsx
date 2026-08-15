@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase"; // Kiểm tra lại nếu đường dẫn file supabase của bạn khác
+// Import supabase - nếu dòng dưới báo đỏ bạn chỉ cần đổi tên file/đường dẫn lại chút nhé
+import { supabase } from "@/lib/supabase"; 
 
 export default function Home() {
   const [modalType, setModalType] = useState<"login" | "register" | "napbank" | null>(null);
   
-  // State Form Auth
+  // State Form Auth (Chỉ dùng Username và Password)
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -35,16 +35,21 @@ export default function Home() {
     };
   }, []);
 
+  // Tạo email ảo theo username để Supabase Auth chấp nhận (vì Supabase Auth bắt buộc có email)
+  const getFakeEmail = (uname: string) => `${uname.trim().toLowerCase()}@shop.com`;
+
   // 1. XỬ LÝ ĐĂNG KÝ
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
+    const fakeEmail = getFakeEmail(username);
+
     try {
-      // Đăng ký tài khoản trên Supabase
+      // Đăng ký trên Supabase Auth
       const { data, error: signUpError } = await supabase.auth.signUp({
-        email: email,
+        email: fakeEmail,
         password: password,
         options: {
           data: { username: username }
@@ -59,7 +64,6 @@ export default function Home() {
           {
             id: data.user.id,
             username: username,
-            email: email,
             balance: 0,
             role: "user"
           }
@@ -67,10 +71,9 @@ export default function Home() {
 
         alert("🎉 Đăng ký tài khoản thành công! Vui lòng đăng nhập.");
         setModalType("login");
-        setPassword("");
       }
     } catch (err: any) {
-      setError(err.message || "Đăng ký thất bại. Vui lòng kiểm tra lại!");
+      setError(err.message || "Tên tài khoản này đã được sử dụng hoặc không hợp lệ!");
     } finally {
       setLoading(false);
     }
@@ -82,9 +85,11 @@ export default function Home() {
     setError("");
     setLoading(true);
 
+    const fakeEmail = getFakeEmail(username);
+
     try {
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: email,
+        email: fakeEmail,
         password: password,
       });
 
@@ -93,7 +98,7 @@ export default function Home() {
       alert("🎉 Đăng nhập thành công!");
       setModalType(null);
     } catch (err: any) {
-      setError("Email hoặc mật khẩu không chính xác!");
+      setError("Tên tài khoản hoặc mật khẩu không chính xác!");
     } finally {
       setLoading(false);
     }
@@ -119,7 +124,7 @@ export default function Home() {
             {user ? (
               <>
                 <span className="text-slate-300">
-                  Chào, <b className="text-amber-400">{user.user_metadata?.username || user.email}</b>
+                  Chào, <b className="text-amber-400">{user.user_metadata?.username || username}</b>
                 </span>
                 <button
                   onClick={() => setModalType("napbank")}
@@ -154,10 +159,10 @@ export default function Home() {
         </div>
       </header>
 
-      {/* TRANG CHỦ CONTENT (Giao diện chính của shop bạn) */}
+      {/* MAIN CONTENT */}
       <main className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold mb-4 text-center">Chào Mừng Đến Với Shop Cầy Thuê Roblox</h1>
-        <p className="text-center text-slate-400">Vui lòng đăng ký/đăng nhập để trải nghiệm dịch vụ nạp tiền và cầy thuê tự động.</p>
+        <p className="text-center text-slate-400">Vui lòng đăng ký/đăng nhập để trải nghiệm dịch vụ.</p>
       </main>
 
       {/* MODAL CỬA SỔ NỔI: ĐĂNG NHẬP / ĐĂNG KÝ */}
@@ -180,13 +185,13 @@ export default function Home() {
                 
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div>
-                    <label className="block text-xs font-medium mb-1 text-slate-300">Email tài khoản</label>
+                    <label className="block text-xs font-medium mb-1 text-slate-300">Tên tài khoản</label>
                     <input
-                      type="email"
+                      type="text"
                       required
-                      placeholder="nhap-email@gmail.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Nhập tên tài khoản"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
                       className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"
                     />
                   </div>
@@ -228,25 +233,13 @@ export default function Home() {
 
                 <form onSubmit={handleRegister} className="space-y-3">
                   <div>
-                    <label className="block text-xs font-medium mb-1 text-slate-300">Tên tài khoản (Username)</label>
+                    <label className="block text-xs font-medium mb-1 text-slate-300">Tên tài khoản</label>
                     <input
                       type="text"
                       required
-                      placeholder="Tên hiển thị của bạn"
+                      placeholder="Nhập tên tài khoản muốn tạo"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium mb-1 text-slate-300">Email (Dùng để khôi phục mật khẩu)</label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="email@gmail.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
                       className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500"
                     />
                   </div>
