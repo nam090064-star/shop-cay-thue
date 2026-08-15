@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "./lib/supabase";
 
-// ==========================================
-// KHO GÓI CÀY THUÊ (Bạn có thể thêm/sửa gói ở đây)
-// ==========================================
+// KHO GÓI CÀY THUÊ
 const CAY_THUE_SERVICES = [
   { id: "1", name: "Cày Level 1 - 2550 (Max Level)", price: 50000 },
   { id: "2", name: "Lấy Tộc V4 (Full Gear)", price: 150000 },
@@ -14,14 +12,12 @@ const CAY_THUE_SERVICES = [
   { id: "5", name: "Farm 10.000.000 Beli", price: 30000 },
 ];
 
-const ACC_SERVICES: any[] = [];
-
 export default function Home() {
   const [modalType, setModalType] = useState<"login" | "register" | "nap_tien" | null>(null);
   const [activeTab, setActiveTab] = useState<"all" | "caythue" | "shopacc">("all");
 
-  // Form Cày Thuê
-  const [selectedServiceId, setSelectedServiceId] = useState<string>("");
+  // State Form Cày Thuê
+  const [selectedServiceId, setSelectedServiceId] = useState("");
   const [robloxUsername, setRobloxUsername] = useState("");
   const [robloxPassword, setRobloxPassword] = useState("");
   const [twoFactorOrCookie, setTwoFactorOrCookie] = useState("");
@@ -68,11 +64,9 @@ export default function Home() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const fakeEmail = getFakeEmail(username);
-
     try {
       const { data, error: signUpError } = await supabase.auth.signUp({
-        email: fakeEmail,
+        email: getFakeEmail(username),
         password: password,
         options: { data: { username: username } }
       });
@@ -97,11 +91,9 @@ export default function Home() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const fakeEmail = getFakeEmail(username);
-
     try {
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: fakeEmail,
+        email: getFakeEmail(username),
         password: password,
       });
 
@@ -123,8 +115,7 @@ export default function Home() {
     alert("Đã đăng xuất thành công!");
   };
 
-  // Xử lý submit đơn cày thuê
-  const handleCreateOrder = async (e: React.FormEvent) => {
+  const handleCreateOrder = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
       alert("Vui lòng đăng nhập để tạo đơn hàng!");
@@ -137,10 +128,8 @@ export default function Home() {
     }
 
     const currentService = CAY_THUE_SERVICES.find((s) => s.id === selectedServiceId);
-
     alert(`🎉 Tạo đơn thành công!\n- Dịch vụ: ${currentService?.name}\n- Giá: ${currentService?.price.toLocaleString("vi-VN")}đ\nShop sẽ xử lý trong 24h!`);
 
-    // Reset form
     setRobloxUsername("");
     setRobloxPassword("");
     setTwoFactorOrCookie("");
@@ -153,12 +142,12 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
       
-      {/* HEADER / NAVBAR */}
+      {/* HEADER */}
       <header className="bg-white border-b border-sky-100 sticky top-0 z-40 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => setActiveTab("all")}>
             <div className="bg-gradient-to-r from-sky-400 to-blue-600 text-white font-black text-xl px-3 py-1 rounded-xl shadow-md tracking-wider">
-              MYSHOP.COM
+              RobloxGiaRe.Com
             </div>
           </div>
 
@@ -201,10 +190,9 @@ export default function Home() {
         </div>
       </header>
 
-      {/* MAIN CONTAINER */}
+      {/* BODY MAIN */}
       <main className="max-w-4xl mx-auto px-4 py-8">
         
-        {/* NÚT QUAY LẠI TRANG CHỦ (Nếu đang lọc tab) */}
         {activeTab !== "all" && (
           <button
             onClick={() => setActiveTab("all")}
@@ -214,9 +202,7 @@ export default function Home() {
           </button>
         )}
 
-        {/* ========================================== */}
-        {/* TRANG CHỦ: DANH MỤC BAN ĐẦU */}
-        {/* ========================================== */}
+        {/* TRANG CHỦ DANH MỤC */}
         {activeTab === "all" && (
           <div>
             <div className="text-center mb-8">
@@ -235,7 +221,7 @@ export default function Home() {
               >
                 <div className="w-full h-48 rounded-2xl overflow-hidden mb-4 border border-sky-200 shadow-inner">
                   <img 
-                    src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500" 
+                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQO45TU5JEnlwnzDggYwOifSvWmta1W1xqG03t-4j5Zw&s=10" 
                     alt="Cày Thuê Blox Fruits" 
                     className="w-full h-full object-cover"
                   />
@@ -258,7 +244,7 @@ export default function Home() {
               >
                 <div className="w-full h-48 rounded-2xl overflow-hidden mb-4 border border-sky-200 shadow-inner">
                   <img 
-                    src="https://images.unsplash.com/photo-1560253023-3ec5d502959f?w=500" 
+                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRT0Ly8DLwNKc5s7LR5ibSeVeXEX6qX0IC_3fZC1S7Pmg&s=10" 
                     alt="Acc Blox Fruits Tổng Hợp" 
                     className="w-full h-full object-cover"
                   />
@@ -278,13 +264,10 @@ export default function Home() {
           </div>
         )}
 
-        {/* ========================================== */}
-        {/* GIAO DIỆN FORM ĐẶT CÀY THUÊ (MỤC CÀY THUÊ) */}
-        {/* ========================================== */}
+        {/* KHU VỰC FORM CÀY THUÊ */}
         {activeTab === "caythue" && (
           <div className="space-y-6">
             
-            {/* TIÊU ĐỀ HỆ THỐNG */}
             <div className="text-center mb-6">
               <h1 className="text-2xl md:text-3xl font-black text-sky-600 tracking-wide uppercase">
                 Dịch Vụ - CÀY THUÊ BLOX-FRUITS
@@ -292,22 +275,9 @@ export default function Home() {
               <div className="w-16 h-1 bg-sky-400 mx-auto mt-2 rounded-full"></div>
             </div>
 
-            {/* BẢNG LƯU Ý KHI CÀY THUÊ */}
-            <div className="bg-amber-50 border-2 border-amber-200 rounded-3xl p-4 md:p-5 text-amber-900 text-xs md:text-sm space-y-2 shadow-sm">
-              <h4 className="font-extrabold text-amber-800 text-base flex items-center gap-2">
-                ⚠️ LƯU Ý QUAN TRỌNG KHI CÀY THUÊ:
-              </h4>
-              <ul className="list-disc pl-5 space-y-1 text-amber-800/90 font-medium">
-                <li><b>Vui lòng tắt xác minh 2 bước (2FA)</b> hoặc cung cấp <b>Mã dự phòng</b> để Admin vào cày nhanh nhất.</li>
-                <li>Không đăng nhập vào Nick Roblox trong lúc Admin đang thực hiện đơn cày thuê.</li>
-                <li>Đổi mật khẩu ngay sau khi đơn hàng báo <b>Hoàn thành</b> để đảm bảo an toàn tuyệt đối.</li>
-              </ul>
-            </div>
-
-            {/* FORM ĐẶT ĐƠN HÀNG */}
             <form onSubmit={handleCreateOrder} className="space-y-6">
               
-              {/* BƯỚC 1: CHỌN GÓI DỊCH VỤ */}
+              {/* BƯỚC 1 */}
               <div className="bg-white border-2 border-sky-100 rounded-3xl p-5 shadow-sm space-y-4">
                 <div className="flex items-center gap-3">
                   <span className="w-7 h-7 bg-sky-500 text-white rounded-full flex items-center justify-center font-black text-sm shadow-sm">
@@ -321,16 +291,16 @@ export default function Home() {
                   onChange={(e) => setSelectedServiceId(e.target.value)}
                   className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-sky-500 text-slate-700 font-medium"
                 >
-                  <option value="">-- Tìm và chọn gói dịch vụ... --</option>
+                  <option value="">Tìm và chọn gói dịch vụ...</option>
                   {CAY_THUE_SERVICES.map((service) => (
                     <option key={service.id} value={service.id}>
-                      {service.name} - ({service.price.toLocaleString("vi-VN")} VNĐ)
+                      {service.name} - {service.price.toLocaleString("vi-VN")} VNĐ
                     </option>
                   ))}
                 </select>
               </div>
 
-              {/* BƯỚC 2: THÔNG TIN TÀI KHOẢN */}
+              {/* BƯỚC 2 */}
               <div className="bg-white border-2 border-sky-100 rounded-3xl p-5 shadow-sm space-y-4">
                 <div className="flex items-center gap-3">
                   <span className="w-7 h-7 bg-sky-500 text-white rounded-full flex items-center justify-center font-black text-sm shadow-sm">
@@ -365,19 +335,19 @@ export default function Home() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Cookie / 2FA / Mã Dự Phòng</label>
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Cookie / 2FA</label>
                   <input
                     type="text"
-                    placeholder="Có thể nhập chuỗi 2FA, mã dự phòng hoặc cookie liên quan"
+                    placeholder="Có thể nhập chuỗi 2FA, link game pass hoặc cookie liên quan"
                     value={twoFactorOrCookie}
                     onChange={(e) => setTwoFactorOrCookie(e.target.value)}
                     className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-sky-500"
                   />
-                  <p className="text-[11px] text-slate-400 mt-1">ⓘ Dữ liệu này không bắt buộc, có thể bỏ trống nếu đã tắt 2FA.</p>
+                  <p className="text-[11px] text-slate-400 mt-1">ⓘ Dữ liệu này không bắt buộc, có thể bỏ trống</p>
                 </div>
               </div>
 
-              {/* BƯỚC 3: GHI CHÚ & XÁC NHẬN */}
+              {/* BƯỚC 3 */}
               <div className="bg-white border-2 border-sky-100 rounded-3xl p-5 shadow-sm space-y-4">
                 <div className="flex items-center gap-3">
                   <span className="w-7 h-7 bg-sky-500 text-white rounded-full flex items-center justify-center font-black text-sm shadow-sm">
@@ -387,7 +357,7 @@ export default function Home() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Ghi Chú Cho Admin</label>
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Ghi Chú</label>
                   <textarea
                     rows={3}
                     maxLength={500}
@@ -425,9 +395,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* ========================================== */}
-        {/* KHO ACC BLOX FRUITS */}
-        {/* ========================================== */}
+        {/* ACC STORE */}
         {activeTab === "shopacc" && (
           <div className="bg-white border-2 border-dashed border-sky-200 p-8 rounded-3xl text-center text-slate-400">
             Kho Acc đang chuẩn bị cập nhật...
@@ -436,7 +404,7 @@ export default function Home() {
 
       </main>
 
-      {/* MODALS HỘP THOẠI NỔI (ĐĂNG NHẬP / ĐĂNG KÝ / NẠP TIỀN) */}
+      {/* MODALS */}
       {modalType && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white border border-sky-100 w-full max-w-md rounded-3xl p-6 relative shadow-2xl">
@@ -447,7 +415,6 @@ export default function Home() {
               ✕
             </button>
 
-            {/* FORM ĐĂNG NHẬP */}
             {modalType === "login" && (
               <div>
                 <h2 className="text-xl font-extrabold mb-4 text-center text-sky-600 uppercase">ĐĂNG NHẬP TÀI KHOẢN</h2>
@@ -483,16 +450,9 @@ export default function Home() {
                     {loading ? "Đang xử lý..." : "Đăng Nhập"}
                   </button>
                 </form>
-                <p className="text-xs text-center mt-4 text-slate-500">
-                  Chưa có tài khoản?{" "}
-                  <button onClick={() => { setModalType("register"); setError(""); }} className="text-sky-600 font-bold hover:underline">
-                    Đăng ký ngay
-                  </button>
-                </p>
               </div>
             )}
 
-            {/* FORM ĐĂNG KÝ */}
             {modalType === "register" && (
               <div>
                 <h2 className="text-xl font-extrabold mb-4 text-center text-sky-600 uppercase">ĐĂNG KÝ TÀI KHOẢN</h2>
@@ -528,16 +488,9 @@ export default function Home() {
                     {loading ? "Đang tạo tài khoản..." : "Tạo Tài Khoản"}
                   </button>
                 </form>
-                <p className="text-xs text-center mt-4 text-slate-500">
-                  Đã có tài khoản?{" "}
-                  <button onClick={() => { setModalType("login"); setError(""); }} className="text-sky-600 font-bold hover:underline">
-                    Đăng nhập
-                  </button>
-                </p>
               </div>
             )}
 
-            {/* MODAL NẠP TIỀN */}
             {modalType === "nap_tien" && (
               <div>
                 <h2 className="text-lg font-extrabold mb-3 text-center text-sky-600 uppercase">NẠP TIỀN TỰ ĐỘNG</h2>
@@ -545,9 +498,6 @@ export default function Home() {
                   <p className="font-bold text-slate-700">📌 Ngân hàng: <b className="text-sky-600">MB BANK</b></p>
                   <p className="font-bold text-slate-700">📌 Số tài khoản: <b className="text-sky-600">0399999999</b></p>
                   <p className="font-bold text-slate-700">📌 Chủ tài khoản: <b>NGUYEN VAN A</b></p>
-                  <p className="font-bold text-rose-600 bg-rose-50 p-2 rounded-lg border border-rose-200">
-                    Nội dung chuyển khoản: <b className="text-sky-700 uppercase">NAP {user?.user_metadata?.username || username}</b>
-                  </p>
                 </div>
                 <button
                   onClick={() => setModalType(null)}
