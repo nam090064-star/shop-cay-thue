@@ -152,7 +152,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
       {/* THẺ PHÁT NHẠC NỀN */}
-      <audio id="bg-audio" loop src="/nhachill.mp3" />
+      <audio id="bg-audio" loop src="/nhacchill.mp3" />
 
       {/* NÚT BẬT/TẮT NHẠC NỔI GÓC DƯỚI BÊN TRÁI */}
       <button
