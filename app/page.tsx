@@ -3,14 +3,26 @@
 import { useState, useEffect } from "react";
 import { supabase } from "./lib/supabase";
 
-// Danh sách 3 dịch vụ Cày thuê ban đầu (Tổng 5 mục dịch vụ cùng với 2 Acc)
-const CAY_THUE_SERVICES = [
-  { id: 1, name: "Up Level Max (2550)", price: 50000, image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500" },
-  { id: 2, name: "Cày Melee V2 (Godhuman)", price: 80000, image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=500" },
-  { id: 3, name: "Săn Tộc V4 (Full Gear)", price: 150000, image: "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=500" },
+// 1. NHÓM DỊCH VỤ CÀY THUÊ LẺ
+const CAY_THUE_LE = [
+  { id: 1, name: "Up Level Max (2550)", price: 50000, desc: "Cày cấp siêu tốc 24h", image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500" },
+  { id: 2, name: "Cày Melee V2 (Godhuman)", price: 80000, desc: "Full nguyên liệu + tiền", image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=500" },
+  { id: 3, name: "Farm 10.000.000 Beli & 50k Fragment", price: 40000, desc: "Farm bằng tay an toàn 100%", image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500" },
 ];
 
-// Danh sách 2 Acc Blox Fruits
+// 2. NHÓM COMBO: LẤY RỒNG V4 TỪ A - Z
+const COMBO_RONG_V4 = [
+  { id: 11, name: "Combo Rồng V4 Tối Thượng (Full Gear)", price: 250000, desc: "Bao gồm gạt cần gạt + Thức tỉnh V4 Full Skill", image: "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=500" },
+  { id: 12, name: "Combo Đảo Trái Tim + Moai + V4 Tier 1", price: 180000, desc: "Tìm đảo trăng tròn & làm quest V4", image: "https://images.unsplash.com/photo-1560253023-3ec5d502959f?w=500" },
+];
+
+// 3. NHÓM COMBO: LẤY FULL HAKI
+const COMBO_HAKI = [
+  { id: 21, name: "Combo Full Haki Trắng / Đỏ / Tuyết", price: 90000, desc: "Sở hữu trọn bộ 3 màu Haki huyền thoại", image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=500" },
+  { id: 22, name: "Combo Full Haki Quan Sát V2 + Haki Vũ Khí", price: 120000, desc: "Mở khoá Ken V2 + Max điểm Haki", image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500" },
+];
+
+// KHO ACC BLOX FRUITS
 const ACC_BLOXFRUITS_LIST = [
   { id: 101, title: "Acc Max Level + Mochi V2", price: 120000, code: "ACC-01", desc: "Godhuman, CDK, Mochi V2 Full Skill", image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=500" },
   { id: 102, title: "Acc Race V4 Full Gear + Dragon", price: 250000, code: "ACC-02", desc: "Tộc V4 Thỏ, Trái Rồng Permanent", image: "https://images.unsplash.com/photo-1560253023-3ec5d502959f?w=500" },
@@ -18,11 +30,9 @@ const ACC_BLOXFRUITS_LIST = [
 
 export default function Home() {
   const [modalType, setModalType] = useState<"login" | "register" | "order_caythue" | "buy_acc" | "nap_tien" | null>(null);
-  
-  // State quản lý mục đang xem (mặc định xem tất cả hoặc bấm chọn riêng từng mục)
   const [activeTab, setActiveTab] = useState<"all" | "caythue" | "shopacc">("all");
-  
-  // State lưu món đang chọn để mua/đặt đơn
+  const [cayThueSubTab, setCayThueSubTab] = useState<"le" | "rong_v4" | "haki">("le");
+
   const [selectedService, setSelectedService] = useState<any>(null);
   const [selectedAcc, setSelectedAcc] = useState<any>(null);
 
@@ -37,7 +47,6 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // User & Profile State
   const [user, setUser] = useState<any>(null);
   const [balance, setBalance] = useState<number>(0);
 
@@ -70,7 +79,6 @@ export default function Home() {
 
   const getFakeEmail = (uname: string) => `${uname.trim().toLowerCase()}@shop.com`;
 
-  // 1. ĐĂNG KÝ
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -100,7 +108,6 @@ export default function Home() {
     }
   };
 
-  // 2. ĐĂNG NHẬP
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -124,7 +131,6 @@ export default function Home() {
     }
   };
 
-  // 3. ĐĂNG XUẤT
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -132,7 +138,6 @@ export default function Home() {
     alert("Đã đăng xuất thành công!");
   };
 
-  // 4. ĐẶT ĐƠN CÀY THUÊ
   const handleOrderCayThue = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
@@ -147,25 +152,15 @@ export default function Home() {
     setNote("");
   };
 
-  // 5. MUA ACC
   const confirmBuyAcc = () => {
     alert(`🎉 Mua ${selectedAcc?.title} thành công! Thông tin acc đã được gửi.`);
     setModalType(null);
   };
 
-  // Hàm chuyển tới mục Cày thuê và cuộn xuống danh sách
-  const openCayThueSection = () => {
+  const openCayThueCategory = (tab: "le" | "rong_v4" | "haki") => {
     setActiveTab("caythue");
+    setCayThueSubTab(tab);
     const element = document.getElementById("cay-thue-section");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
-  // Hàm chuyển tới mục Acc Blox Fruits
-  const openShopAccSection = () => {
-    setActiveTab("shopacc");
-    const element = document.getElementById("shop-acc-section");
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
@@ -222,7 +217,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* BANNER SHOP */}
+      {/* BANNER */}
       <div className="max-w-6xl mx-auto px-4 pt-6 pb-2">
         <div className="rounded-2xl overflow-hidden shadow-lg border-2 border-sky-200 mb-6 bg-slate-900 relative">
           <img 
@@ -238,7 +233,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* 2 MỤC CHÍNH CỦA SHOP */}
       <main className="max-w-6xl mx-auto px-4 pb-12">
         <div className="text-center mb-8">
           <h2 className="text-2xl md:text-3xl font-black text-sky-600 mb-2 uppercase tracking-wide">
@@ -247,11 +241,12 @@ export default function Home() {
           <p className="text-slate-500 text-xs md:text-sm">Bấm chọn mục bạn cần bên dưới</p>
         </div>
 
+        {/* 2 KHUNG DANH MỤC TRANG CHỦ */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* MỤC 1: CÀY THUÊ BLOX FRUITS */}
           <div 
-            onClick={openCayThueSection}
+            onClick={() => openCayThueCategory("le")}
             className="bg-sky-50/60 border-2 border-sky-200 rounded-3xl p-5 shadow-md flex flex-col items-center text-center cursor-pointer hover:shadow-xl hover:scale-[1.01] transition duration-300"
           >
             <div className="w-full h-48 rounded-2xl overflow-hidden mb-4 border border-sky-200 shadow-inner">
@@ -268,7 +263,7 @@ export default function Home() {
               Sẵn Sàng
             </span>
             <button
-              onClick={(e) => { e.stopPropagation(); openCayThueSection(); }}
+              onClick={(e) => { e.stopPropagation(); openCayThueCategory("le"); }}
               className="w-full py-3 bg-sky-400 hover:bg-sky-500 text-white font-black rounded-2xl text-base shadow-md transition flex items-center justify-center gap-2"
             >
               XEM TẤT CẢ &rarr;
@@ -277,7 +272,7 @@ export default function Home() {
 
           {/* MỤC 2: ACC BLOX FRUITS TỔNG HỢP */}
           <div 
-            onClick={openShopAccSection}
+            onClick={() => { setActiveTab("shopacc"); document.getElementById("shop-acc-section")?.scrollIntoView({ behavior: "smooth" }); }}
             className="bg-sky-50/60 border-2 border-sky-200 rounded-3xl p-5 shadow-md flex flex-col items-center text-center cursor-pointer hover:shadow-xl hover:scale-[1.01] transition duration-300"
           >
             <div className="w-full h-48 rounded-2xl overflow-hidden mb-4 border border-sky-200 shadow-inner">
@@ -294,7 +289,7 @@ export default function Home() {
               Còn 25 Acc
             </span>
             <button
-              onClick={(e) => { e.stopPropagation(); openShopAccSection(); }}
+              onClick={(e) => { e.stopPropagation(); setActiveTab("shopacc"); document.getElementById("shop-acc-section")?.scrollIntoView({ behavior: "smooth" }); }}
               className="w-full py-3 bg-sky-400 hover:bg-sky-500 text-white font-black rounded-2xl text-base shadow-md transition flex items-center justify-center gap-2"
             >
               XEM TẤT CẢ &rarr;
@@ -303,34 +298,57 @@ export default function Home() {
 
         </div>
 
-        {/* NÚT HIỂN THỊ TẤT CẢ DỊCH VỤ */}
-        {activeTab !== "all" && (
-          <div className="text-center mt-6">
-            <button 
-              onClick={() => setActiveTab("all")}
-              className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs transition"
-            >
-              🔄 Hiển thị tất cả các mục
-            </button>
-          </div>
-        )}
-
-        {/* KHU VỰC 1: CHI TIẾT DANH SÁCH GÓI CÀY THUÊ */}
+        {/* KHU VỰC CÀY THUÊ CÓ NÚT CHUYỂN TAB DỊCH VỤ */}
         {(activeTab === "caythue" || activeTab === "all") && (
           <div id="cay-thue-section" className="mt-12 pt-4">
-            <div className="flex items-center justify-between mb-4 border-b-2 border-sky-100 pb-2">
-              <h3 className="text-xl font-extrabold text-sky-600 flex items-center gap-2">
+            <div className="text-center mb-6">
+              <h3 className="text-xl font-black text-sky-600 uppercase mb-4">
                 ⚡ GÓI CÀY THUÊ BLOX FRUITS
               </h3>
-              <span className="text-xs text-slate-400 font-medium">Khách chọn dịch vụ và bấm "Đặt Đơn Ngay"</span>
+
+              {/* 3 NÚT CHỌN LOẠI CÀY THUÊ */}
+              <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3">
+                <button
+                  onClick={() => setCayThueSubTab("le")}
+                  className={`px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm transition shadow-sm ${
+                    cayThueSubTab === "le" 
+                      ? "bg-sky-500 text-white shadow-md" 
+                      : "bg-white text-slate-600 border border-sky-200 hover:bg-sky-50"
+                  }`}
+                >
+                  📝 Dịch Vụ Cày Thuê Lẻ
+                </button>
+                <button
+                  onClick={() => setCayThueSubTab("rong_v4")}
+                  className={`px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm transition shadow-sm ${
+                    cayThueSubTab === "rong_v4" 
+                      ? "bg-sky-500 text-white shadow-md" 
+                      : "bg-white text-slate-600 border border-sky-200 hover:bg-sky-50"
+                  }`}
+                >
+                  🐉 Combo Rồng V4 Từ A - Z
+                </button>
+                <button
+                  onClick={() => setCayThueSubTab("haki")}
+                  className={`px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm transition shadow-sm ${
+                    cayThueSubTab === "haki" 
+                      ? "bg-sky-500 text-white shadow-md" 
+                      : "bg-white text-slate-600 border border-sky-200 hover:bg-sky-50"
+                  }`}
+                >
+                  ✨ Combo Lấy Full Haki
+                </button>
+              </div>
             </div>
 
+            {/* DANH SÁCH DỊCH VỤ HIỂN THỊ THEO TAB ĐANG CHỌN */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {CAY_THUE_SERVICES.map((s) => (
+              {(cayThueSubTab === "le" ? CAY_THUE_LE : cayThueSubTab === "rong_v4" ? COMBO_RONG_V4 : COMBO_HAKI).map((s) => (
                 <div key={s.id} className="bg-white border-2 border-sky-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between">
                   <div>
                     <img src={s.image} alt={s.name} className="h-36 w-full object-cover rounded-xl mb-3" />
                     <h4 className="font-extrabold text-base text-slate-800 mb-1">{s.name}</h4>
+                    <p className="text-xs text-slate-500 mb-2">{s.desc}</p>
                   </div>
                   <div className="mt-3">
                     <p className="text-sky-600 font-black text-lg mb-3">{s.price.toLocaleString("vi-VN")} VNĐ</p>
@@ -350,7 +368,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* KHU VỰC 2: CHI TIẾT ACC BLOX FRUITS */}
+        {/* KHU VỰC ACC BLOX FRUITS */}
         {(activeTab === "shopacc" || activeTab === "all") && (
           <div id="shop-acc-section" className="mt-12 pt-4">
             <div className="flex items-center justify-between mb-4 border-b-2 border-sky-100 pb-2">
