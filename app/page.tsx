@@ -227,7 +227,7 @@ export default function Home() {
           >
             <div className="w-full h-48 rounded-2xl overflow-hidden mb-4 border border-sky-200 shadow-inner">
               <img 
-                src="" 
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRT0Ly8DLwNKc5s7LR5ibSeVeXEX6qX0IC_3fZC1S7Pmg&s=10" 
                 alt="Cày Thuê Blox Fruits" 
                 className="w-full h-full object-cover"
               />
