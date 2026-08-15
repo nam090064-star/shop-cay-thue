@@ -3,35 +3,20 @@
 import { useState, useEffect } from "react";
 import { supabase } from "./lib/supabase";
 
-// 1. NHÓM DỊCH VỤ CÀY THUÊ LẺ
-const CAY_THUE_LE = [
-  { id: 1, name: "Up Level Max (2550)", price: 50000, desc: "Cày cấp siêu tốc 24h", image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500" },
-  { id: 2, name: "Cày Melee V2 (Godhuman)", price: 80000, desc: "Full nguyên liệu + tiền", image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=500" },
-  { id: 3, name: "Farm 10.000.000 Beli & 50k Fragment", price: 40000, desc: "Farm bằng tay an toàn 100%", image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500" },
+// ==========================================
+// KHO DỮ LIỆU TRỐNG - ĐANG CHỜ BẠN THÊM MỚI
+// ==========================================
+const CAY_THUE_SERVICES: any[] = [
+  // Bạn sẽ thêm các gói cày thuê vào đây sau
 ];
 
-// 2. NHÓM COMBO: LẤY RỒNG V4 TỪ A - Z
-const COMBO_RONG_V4 = [
-  { id: 11, name: "Combo Rồng V4 Tối Thượng (Full Gear)", price: 250000, desc: "Bao gồm gạt cần gạt + Thức tỉnh V4 Full Skill", image: "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=500" },
-  { id: 12, name: "Combo Đảo Trái Tim + Moai + V4 Tier 1", price: 180000, desc: "Tìm đảo trăng tròn & làm quest V4", image: "https://images.unsplash.com/photo-1560253023-3ec5d502959f?w=500" },
-];
-
-// 3. NHÓM COMBO: LẤY FULL HAKI
-const COMBO_HAKI = [
-  { id: 21, name: "Combo Full Haki Trắng / Đỏ / Tuyết", price: 90000, desc: "Sở hữu trọn bộ 3 màu Haki huyền thoại", image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=500" },
-  { id: 22, name: "Combo Full Haki Quan Sát V2 + Haki Vũ Khí", price: 120000, desc: "Mở khoá Ken V2 + Max điểm Haki", image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500" },
-];
-
-// KHO ACC BLOX FRUITS
-const ACC_BLOXFRUITS_LIST = [
-  { id: 101, title: "Acc Max Level + Mochi V2", price: 120000, code: "ACC-01", desc: "Godhuman, CDK, Mochi V2 Full Skill", image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=500" },
-  { id: 102, title: "Acc Race V4 Full Gear + Dragon", price: 250000, code: "ACC-02", desc: "Tộc V4 Thỏ, Trái Rồng Permanent", image: "https://images.unsplash.com/photo-1560253023-3ec5d502959f?w=500" },
+const ACC_SERVICES: any[] = [
+  // Bạn sẽ thêm các gói acc vào đây sau
 ];
 
 export default function Home() {
   const [modalType, setModalType] = useState<"login" | "register" | "order_caythue" | "buy_acc" | "nap_tien" | null>(null);
   const [activeTab, setActiveTab] = useState<"all" | "caythue" | "shopacc">("all");
-  const [cayThueSubTab, setCayThueSubTab] = useState<"le" | "rong_v4" | "haki">("le");
 
   const [selectedService, setSelectedService] = useState<any>(null);
   const [selectedAcc, setSelectedAcc] = useState<any>(null);
@@ -157,15 +142,6 @@ export default function Home() {
     setModalType(null);
   };
 
-  const openCayThueCategory = (tab: "le" | "rong_v4" | "haki") => {
-    setActiveTab("caythue");
-    setCayThueSubTab(tab);
-    const element = document.getElementById("cay-thue-section");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
       
@@ -238,7 +214,7 @@ export default function Home() {
           <h2 className="text-2xl md:text-3xl font-black text-sky-600 mb-2 uppercase tracking-wide">
             DANH MỤC DỊCH VỤ BLOX FRUITS
           </h2>
-          <p className="text-slate-500 text-xs md:text-sm">Bấm chọn mục bạn cần bên dưới</p>
+          <p className="text-slate-500 text-xs md:text-sm">Chọn dịch vụ bạn cần bên dưới</p>
         </div>
 
         {/* 2 KHUNG DANH MỤC TRANG CHỦ */}
@@ -246,7 +222,7 @@ export default function Home() {
           
           {/* MỤC 1: CÀY THUÊ BLOX FRUITS */}
           <div 
-            onClick={() => openCayThueCategory("le")}
+            onClick={() => { setActiveTab("caythue"); document.getElementById("cay-thue-section")?.scrollIntoView({ behavior: "smooth" }); }}
             className="bg-sky-50/60 border-2 border-sky-200 rounded-3xl p-5 shadow-md flex flex-col items-center text-center cursor-pointer hover:shadow-xl hover:scale-[1.01] transition duration-300"
           >
             <div className="w-full h-48 rounded-2xl overflow-hidden mb-4 border border-sky-200 shadow-inner">
@@ -263,7 +239,7 @@ export default function Home() {
               Sẵn Sàng
             </span>
             <button
-              onClick={(e) => { e.stopPropagation(); openCayThueCategory("le"); }}
+              onClick={(e) => { e.stopPropagation(); setActiveTab("caythue"); document.getElementById("cay-thue-section")?.scrollIntoView({ behavior: "smooth" }); }}
               className="w-full py-3 bg-sky-400 hover:bg-sky-500 text-white font-black rounded-2xl text-base shadow-md transition flex items-center justify-center gap-2"
             >
               XEM TẤT CẢ &rarr;
@@ -286,7 +262,7 @@ export default function Home() {
               ACC BLOX-FRUITS TỔNG HỢP
             </h3>
             <span className="bg-sky-100 text-rose-600 text-xs font-bold px-4 py-1 rounded-full mb-4 border border-sky-300">
-              Còn 25 Acc
+              Sẵn Sàng
             </span>
             <button
               onClick={(e) => { e.stopPropagation(); setActiveTab("shopacc"); document.getElementById("shop-acc-section")?.scrollIntoView({ behavior: "smooth" }); }}
@@ -298,111 +274,84 @@ export default function Home() {
 
         </div>
 
-        {/* KHU VỰC CÀY THUÊ CÓ NÚT CHUYỂN TAB DỊCH VỤ */}
+        {/* KHU VỰC CÀY THUÊ */}
         {(activeTab === "caythue" || activeTab === "all") && (
           <div id="cay-thue-section" className="mt-12 pt-4">
-            <div className="text-center mb-6">
-              <h3 className="text-xl font-black text-sky-600 uppercase mb-4">
-                ⚡ GÓI CÀY THUÊ BLOX FRUITS
-              </h3>
+            <h3 className="text-xl font-extrabold text-sky-600 mb-4 pb-2 border-b-2 border-sky-100 uppercase">
+              ⚡ GÓI CÀY THUÊ BLOX FRUITS
+            </h3>
 
-              {/* 3 NÚT CHỌN LOẠI CÀY THUÊ */}
-              <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3">
-                <button
-                  onClick={() => setCayThueSubTab("le")}
-                  className={`px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm transition shadow-sm ${
-                    cayThueSubTab === "le" 
-                      ? "bg-sky-500 text-white shadow-md" 
-                      : "bg-white text-slate-600 border border-sky-200 hover:bg-sky-50"
-                  }`}
-                >
-                  📝 Dịch Vụ Cày Thuê Lẻ
-                </button>
-                <button
-                  onClick={() => setCayThueSubTab("rong_v4")}
-                  className={`px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm transition shadow-sm ${
-                    cayThueSubTab === "rong_v4" 
-                      ? "bg-sky-500 text-white shadow-md" 
-                      : "bg-white text-slate-600 border border-sky-200 hover:bg-sky-50"
-                  }`}
-                >
-                  🐉 Combo Rồng V4 Từ A - Z
-                </button>
-                <button
-                  onClick={() => setCayThueSubTab("haki")}
-                  className={`px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm transition shadow-sm ${
-                    cayThueSubTab === "haki" 
-                      ? "bg-sky-500 text-white shadow-md" 
-                      : "bg-white text-slate-600 border border-sky-200 hover:bg-sky-50"
-                  }`}
-                >
-                  ✨ Combo Lấy Full Haki
-                </button>
+            {CAY_THUE_SERVICES.length === 0 ? (
+              <div className="bg-white border-2 border-dashed border-sky-200 p-8 rounded-2xl text-center text-slate-400">
+                Chưa có dịch vụ cày thuê nào. Hãy gửi thông tin dịch vụ để chúng ta cùng thêm vào!
               </div>
-            </div>
-
-            {/* DANH SÁCH DỊCH VỤ HIỂN THỊ THEO TAB ĐANG CHỌN */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {(cayThueSubTab === "le" ? CAY_THUE_LE : cayThueSubTab === "rong_v4" ? COMBO_RONG_V4 : COMBO_HAKI).map((s) => (
-                <div key={s.id} className="bg-white border-2 border-sky-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between">
-                  <div>
-                    <img src={s.image} alt={s.name} className="h-36 w-full object-cover rounded-xl mb-3" />
-                    <h4 className="font-extrabold text-base text-slate-800 mb-1">{s.name}</h4>
-                    <p className="text-xs text-slate-500 mb-2">{s.desc}</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {CAY_THUE_SERVICES.map((s) => (
+                  <div key={s.id} className="bg-white border-2 border-sky-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                      <img src={s.image} alt={s.name} className="h-36 w-full object-cover rounded-xl mb-3" />
+                      <h4 className="font-extrabold text-base text-slate-800 mb-1">{s.name}</h4>
+                      <p className="text-xs text-slate-500 mb-2">{s.desc}</p>
+                    </div>
+                    <div className="mt-3">
+                      <p className="text-sky-600 font-black text-lg mb-3">{s.price.toLocaleString("vi-VN")} VNĐ</p>
+                      <button
+                        onClick={() => { 
+                          setSelectedService(s); 
+                          setModalType("order_caythue"); 
+                        }}
+                        className="w-full py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl text-sm transition shadow-md flex items-center justify-center gap-1"
+                      >
+                        📝 Đặt Đơn Ngay
+                      </button>
+                    </div>
                   </div>
-                  <div className="mt-3">
-                    <p className="text-sky-600 font-black text-lg mb-3">{s.price.toLocaleString("vi-VN")} VNĐ</p>
-                    <button
-                      onClick={() => { 
-                        setSelectedService(s); 
-                        setModalType("order_caythue"); 
-                      }}
-                      className="w-full py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl text-sm transition shadow-md flex items-center justify-center gap-1"
-                    >
-                      📝 Đặt Đơn Ngay
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
         {/* KHU VỰC ACC BLOX FRUITS */}
         {(activeTab === "shopacc" || activeTab === "all") && (
           <div id="shop-acc-section" className="mt-12 pt-4">
-            <div className="flex items-center justify-between mb-4 border-b-2 border-sky-100 pb-2">
-              <h3 className="text-xl font-extrabold text-sky-600 flex items-center gap-2">
-                🛒 KHO ACC BLOX FRUITS TỔNG HỢP
-              </h3>
-            </div>
+            <h3 className="text-xl font-extrabold text-sky-600 mb-4 pb-2 border-b-2 border-sky-100 uppercase">
+              🛒 KHO ACC BLOX FRUITS TỔNG HỢP
+            </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-5">
-              {ACC_BLOXFRUITS_LIST.map((acc) => (
-                <div key={acc.id} className="bg-white border-2 border-sky-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between">
-                  <div>
-                    <img src={acc.image} alt={acc.title} className="h-40 w-full object-cover rounded-xl mb-3" />
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="bg-sky-100 text-sky-700 text-xs font-bold px-2.5 py-0.5 rounded-md">{acc.code}</span>
+            {ACC_SERVICES.length === 0 ? (
+              <div className="bg-white border-2 border-dashed border-sky-200 p-8 rounded-2xl text-center text-slate-400">
+                Chưa có acc nào trong kho. Hãy gửi thông tin acc để chúng ta cùng thêm vào!
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-5">
+                {ACC_SERVICES.map((acc) => (
+                  <div key={acc.id} className="bg-white border-2 border-sky-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                      <img src={acc.image} alt={acc.title} className="h-40 w-full object-cover rounded-xl mb-3" />
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="bg-sky-100 text-sky-700 text-xs font-bold px-2.5 py-0.5 rounded-md">{acc.code}</span>
+                      </div>
+                      <h4 className="font-extrabold text-base text-slate-800 mb-1">{acc.title}</h4>
+                      <p className="text-xs text-slate-500 mb-2">{acc.desc}</p>
                     </div>
-                    <h4 className="font-extrabold text-base text-slate-800 mb-1">{acc.title}</h4>
-                    <p className="text-xs text-slate-500 mb-2">{acc.desc}</p>
+                    <div className="mt-2">
+                      <p className="text-emerald-600 font-black text-lg mb-3">{acc.price.toLocaleString("vi-VN")} VNĐ</p>
+                      <button
+                        onClick={() => {
+                          if (!user) { alert("Vui lòng đăng nhập để mua acc!"); setModalType("login"); return; }
+                          setSelectedAcc(acc); setModalType("buy_acc");
+                        }}
+                        className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-sm transition shadow-md flex items-center justify-center gap-1"
+                      >
+                        🛒 Mua Ngay
+                      </button>
+                    </div>
                   </div>
-                  <div className="mt-2">
-                    <p className="text-emerald-600 font-black text-lg mb-3">{acc.price.toLocaleString("vi-VN")} VNĐ</p>
-                    <button
-                      onClick={() => {
-                        if (!user) { alert("Vui lòng đăng nhập để mua acc!"); setModalType("login"); return; }
-                        setSelectedAcc(acc); setModalType("buy_acc");
-                      }}
-                      className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-sm transition shadow-md flex items-center justify-center gap-1"
-                    >
-                      🛒 Mua Ngay
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </main>
