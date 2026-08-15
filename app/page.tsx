@@ -197,7 +197,7 @@ export default function Home() {
       <div className="max-w-6xl mx-auto px-4 pt-6 pb-2">
         <div className="rounded-2xl overflow-hidden shadow-lg border-2 border-sky-200 mb-6 bg-slate-900 relative">
           <img 
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxawm01oQp_NZxgL7kdZ8yXmxSXiJHJoEF_nklb1x09A&s" 
+            src="https://rpgstash-blog.s3.amazonaws.com/Image_2025-01-23_Dragon1.png" 
             alt="Banner Shop" 
             className="w-full h-48 md:h-72 object-cover opacity-85"
           />
@@ -236,7 +236,7 @@ export default function Home() {
               CÀY THUÊ BLOX-FRUITS
             </h3>
             <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-4 py-1 rounded-full mb-4 border border-emerald-300">
-              Sẵn Sàng
+              Cày Thuê Giá Rẻ
             </span>
             <button
               onClick={(e) => { e.stopPropagation(); setActiveTab("caythue"); document.getElementById("cay-thue-section")?.scrollIntoView({ behavior: "smooth" }); }}
