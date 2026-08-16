@@ -10,7 +10,7 @@ const CATEGORIES = [
     title: "CÀY THUÊ BLOX-FRUITS",
     badge: "Sẵn Sàng",
     badgeColor: "bg-emerald-50 text-emerald-600 border-emerald-200",
-    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=600&auto=format&fit=crop",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQO45TU5JEnlwnzDggYwOifSvWmta1W1xqG03t-4j5Zw&s=10",
     items: [
       { id: "ct-1", name: "Cày Level 1 -> 2550 (Max Level)", price: 50000 },
       { id: "ct-2", name: "Farm 10.000.000 Beli", price: 30000 },
@@ -20,10 +20,10 @@ const CATEGORIES = [
   },
   {
     id: "acc-tong-hop",
-    title: "ACC BLOX-FRUITS TỔNG HỢP",
-    badge: "Còn 23",
+    title: "ACC BLOX-FRUITS Random V4",
+    badge: "Sẵn Sàng",
     badgeColor: "bg-sky-50 text-sky-600 border-sky-200",
-    image: "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=600&auto=format&fit=crop",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkOt5op8NbTeM89SSNJiJAhfNTE9Wle5rCXddf0NfuPw&s=10",
     items: [
       { id: "acc-1", name: "Acc Max Level + Tộc V4 Ngẫu Nhiên", price: 150000 },
       { id: "acc-2", name: "Acc Max Level + Full Gear V4 Tự Chọn", price: 250000 },
@@ -33,9 +33,9 @@ const CATEGORIES = [
   {
     id: "combo-draco",
     title: "COMBO DRACO SIÊU VIP",
-    badge: "Giảm 35%",
+    badge: "Giá Ưu Đãi",
     badgeColor: "bg-rose-50 text-rose-600 border-rose-200",
-    image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600&auto=format&fit=crop",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkOt5op8NbTeM89SSNJiJAhfNTE9Wle5rCXddf0NfuPw&s=10",
     items: [
       { id: "draco-1", name: "Combo Draco Tân Thủ: Level 1500 + Tam Kiếm + 5M Beli", price: 99000 },
       { id: "draco-2", name: "Combo Draco Bá Vương: Max Level + Tộc V4 + CDK", price: 180000 },
@@ -44,9 +44,9 @@ const CATEGORIES = [
   {
     id: "race-v4",
     title: "FULL RACE V4 THƯỜNG",
-    badge: "Hot",
+    badge: "Ưu Đãi",
     badgeColor: "bg-amber-50 text-amber-600 border-amber-200",
-    image: "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=600&auto=format&fit=crop",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQikKJNnW4h7fhv6dpYBqsM_nu5K-zBJMJrJ8qLNYXVg&s=10",
     items: [
       { id: "v4-1", name: "Mở Khóa Tộc V4 (Chưa Gear)", price: 80000 },
       { id: "v4-2", name: "Up Full Gear Tộc V4 Thường", price: 150000 },
@@ -130,7 +130,7 @@ export default function Home() {
         <div className="w-full bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 rounded-2xl overflow-hidden shadow-md relative min-h-[220px] flex items-center justify-center p-6 text-center text-white border-4 border-white">
           <div>
             <h2 className="text-3xl font-black text-amber-400 drop-shadow-md mb-2 uppercase">
-              SHOPEVIL & SHOPSONB.COM
+              Shop Game Duyệt Đơn Siêu Tốc - Siêu Uy Tín #1 Blox Fruits
             </h2>
             <p className="text-sm text-sky-200 max-w-md mx-auto">
               Shop Game Duyệt Đơn Siêu Tốc - Siêu Uy Tín #1 Blox Fruits
@@ -141,10 +141,10 @@ export default function Home() {
         {/* THÔNG BÁO RUNNING */}
         <div className="bg-white rounded-2xl p-4 border border-sky-100 shadow-sm mt-6 text-xs text-slate-600 leading-relaxed">
           <p className="font-bold text-slate-800 mb-1">
-            100% Tài khoản ROBLOX đều là account Global (quốc tế) ngoại trừ mục [ Acc BF Vip ]
+            100% Tài khoản ROBLOX đều là account Global (Quốc Tế)
           </p>
           <div className="flex flex-wrap gap-2 text-[11px] font-semibold text-sky-600">
-            <span>ACC BLOXFRUIT VIP</span> • <span>ACC BLOXFRUIT TỔNG HỢP</span> • <span>CÀY THUÊ</span> • <span>PERM VĨNH VIỄN</span>
+            <span>ACC BLOXFRUIT VIP</span> • <span>ACC BLOXFRUIT V4 Random</span> • <span>CÀY THUÊ</span> • 
           </div>
         </div>
 
