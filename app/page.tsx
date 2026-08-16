@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "./lib/supabase";
+import NoticeModal from "./components/NoticeModal";
 
 // DỮ LIỆU CÁC MỤC DỊCH VỤ / TÀI KHOẢN
 const CATEGORIES = [
@@ -10,7 +11,7 @@ const CATEGORIES = [
     title: "CÀY THUÊ BLOX-FRUITS",
     badge: "Sẵn Sàng",
     badgeColor: "bg-emerald-50 text-emerald-600 border-emerald-200",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQO45TU5JEnlwnzDggYwOifSvWmta1W1xqG03t-4j5Zw&s=10",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQ045TU5JEnlwnzDggyWoifSvWmta1W1xqG03t-4j5Zw&s=10",
     items: [
       { id: "ct-1", name: "Kéo Tim Levi Về Hydra", price: 35000 },
       { id: "ct-2", name: "Kéo Tim Levi Về Tiki", price: 30000 },
@@ -19,416 +20,145 @@ const CATEGORIES = [
       { id: "ct-5", name: "Lấy Kiếm Rồng", price: 35000 },
       { id: "ct-6", name: "Lấy Súng Rồng", price: 40000 },
       { id: "ct-7", name: "Up Full Gear V4 Tộc Đang Dùng", price: 35000 },
-      { id: "ct-8", name: "Lấy Full Đai Rồng", price: 25000 },
-      { id: "ct-9", name: "Gạt Cần (Điều kiện: Có mảnh và mũ)", price: 20000 },
-      { id: "ct-10", name: "10M Beli", price: 10000 },
-      { id: "ct-11", name: "10K Điểm F", price: 5000 },
-      { id: "ct-12", name: "Lấy Fox Lamp", price: 35000 },
-      { id: "ct-13", name: "Lấy Mỏ Neo", price: 30000 },
-      { id: "ct-14", name: "Lấy Mảnh Gương", price: 20000 },
-      { id: "ct-15", name: "Lấy Mũ Rip Indra", price: 20000 },
-      { id: "ct-16", name: "Lấy Guitar Linh Hồn", price: 30000 },
-      { id: "ct-17", name: "Lấy Song Kiếm CDK", price: 45000 },
-      { id: "ct-18", name: "Lấy Tushita", price: 20000 },
-      { id: "ct-19", name: "Lấy Yama", price: 20000 },
-      { id: "ct-20", name: "Lấy Tam Kiếm ZORO Từ A - Z", price: 45000 },
-      { id: "ct-21", name: "Mua 1 Cây Kiếm ZORO", price: 10000 },
-      { id: "ct-22", name: "Lấy Tộc Cyborg (Bonus V3)", price: 35000 },
-      { id: "ct-23", name: "Lấy Tộc Quỷ (Bonus V3)", price: 35000 },
-      { id: "ct-24", name: "Lấy Haki Quan Sát V2", price: 45000 },
-      { id: "ct-25", name: "Level 1 - MAX", price: 45000 },
-      { id: "ct-26", name: "Level 1500 - MAX", price: 30000 },
-      { id: "ct-27", name: "Level 700 - 1500", price: 20000 },
-      { id: "ct-28", name: "Level 1 - 700", price: 10000 },
-    ],
-  },
-  {
-    id: "acc-tong-hop",
-    title: "ACC BLOX FRUITS Random V4",
-    badge: "Sẵn Sàng",
-    badgeColor: "bg-sky-50 text-sky-600 border-sky-200",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRT0Ly8DLwNKc5s7LR5ibSeVeXEX6qX0IC_3fZC1S7Pmg&s=10",
-    items: [
-      { id: "acc-1", name: "Acc Max Lv + Song Kiếm + 1 Race v4 ngẫu nhiên", price: 50000 },
-      { id: "acc-2", name: "Acc Max Level + Song Kiếm + Guitar Linh Hồn", price: 25000 },
-      { id: "acc-3", name: "Acc Max Level + Song Kiếm + Full Tộc V4", price: 120000 },
-    ],
-  },
-  {
-    id: "combo-draco",
-    title: "COMBO DRACO Giá Rẻ",
-    badge: "Giá Ưu Đãi",
-    badgeColor: "bg-rose-50 text-rose-600 border-rose-200",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkOt5op8NbTeM89SSNJiJAhfNTE9Wle5rCXddf0NfuPw&s=10",
-    items: [
-      { id: "draco-1", name: "Combo Cày Thuê Lấy Súng Rồng Kiếm Rồng Tộc Rồng V4 Full Gear", price: 175000 },
-    ],
-  },
-  {
-    id: "race-v4",
-    title: "FULL RACE V4 THƯỜNG",
-    badge: "Ưu Đãi",
-    badgeColor: "bg-amber-50 text-amber-600 border-amber-200",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQikKJNnW4h7fhv6dpYBqsM_nu5K-zBJMJrJ8qLNYXVg&s=10",
-    items: [
-      { id: "v4-1", name: "Combo Cày Thuê Lấy Up All Race v4 lên Full Gear (Trừ Rồng)", price: 180000 },
     ],
   },
 ];
 
 export default function Home() {
-  const [session, setSession] = useState<any>(null);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [selectedCategory, setSelectedCategory] = useState<any>(null);
-  const [selectedItemId, setSelectedItemId] = useState<string>("");
-
-  // State cho Form Cày Thuê
+  const [selectedCategory, setSelectedCategory] = useState(CATEGORIES[0]);
+  const [selectedItem, setSelectedItem] = useState(CATEGORIES[0].items[0]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [twoFactor, setTwoFactor] = useState("");
   const [note, setNote] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage("");
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
+    const { error } = await supabase.from("orders").insert([
+      {
+        category: selectedCategory.title,
+        item_name: selectedItem.name,
+        price: selectedItem.price,
+        username,
+        password,
+        note,
+      },
+    ]);
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    setLoading(false);
 
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const toggleMusic = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
+    if (error) {
+      setMessage("❌ Đã có lỗi xảy ra, vui lòng thử lại!");
     } else {
-      audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+      setMessage("✅ Đặt hàng thành công! Shop sẽ liên hệ với bạn sớm nhất.");
+      setUsername("");
+      setPassword("");
+      setNote("");
     }
-  };
-
-  // Hàm xử lý Đăng xuất
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    alert("Đã đăng xuất thành công!");
-  };
-
-  const handleOrder = () => {
-    const item = selectedCategory.items.find((i: any) => i.id === selectedItemId);
-    if (!item) {
-      alert("Vui lòng chọn gói dịch vụ!");
-      return;
-    }
-
-    if (selectedCategory.id === "cay-thue") {
-      if (!username || !password) {
-        alert("Vui lòng nhập đầy đủ Tài khoản và Mật khẩu Roblox!");
-        return;
-      }
-      alert(`Đã đặt đơn cày thuê thành công!\nGói: ${item.name}\nGiá: ${item.price.toLocaleString()} VNĐ\nTài khoản: ${username}`);
-    } else {
-      alert(`Đã chọn mua thành công: ${item.name}`);
-    }
-    
-    setSelectedCategory(null);
   };
 
   return (
-    <main className="min-h-screen bg-[#f0f6ff] text-slate-800 font-sans pb-16">
-      {/* NHẠC NỀN */}
-      <audio ref={audioRef} src="/nhacchill.mp3" loop preload="auto" />
+    <main className="min-h-screen bg-gray-950 text-white p-4 md:p-8">
+      {/* THÔNG BÁO POPUP */}
+      <NoticeModal />
 
-      {/* HEADER NAVBAR */}
-      <header className="bg-white border-b border-sky-100 sticky top-0 z-50 px-4 py-3 shadow-sm">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="bg-sky-500 text-white p-2 rounded-xl font-black text-xl tracking-wider">
-              RobloxGiaRe.Com
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Nút bật/tắt Nhạc Chill */}
-            <button
-              onClick={toggleMusic}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm border ${
-                isPlaying
-                  ? "bg-emerald-50 text-emerald-600 border-emerald-200 animate-pulse"
-                  : "bg-slate-100 text-slate-600 border-slate-200"
-              }`}
-            >
-              <span>{isPlaying ? "🎵 Đang phát nhạc" : "🔇 Bật nhạc chill"}</span>
-            </button>
-
-            {/* Khối Tài khoản & Đăng xuất */}
-            <div className="bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold text-sky-700">
-              <span className="w-6 h-6 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-bold">
-                👤
-              </span>
-              <span>{session ? session.user.email : "Khách - 0 đ"}</span>
-
-              {/* Nút Đăng xuất chỉ hiển thị khi đã đăng nhập */}
-              {session && (
-                <button
-                  onClick={handleLogout}
-                  className="ml-1 px-2 py-0.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-[10px] font-extrabold transition-all shadow-sm"
-                  title="Đăng xuất"
-                >
-                  Đăng xuất
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* BODY CONTENT */}
-      <div className="max-w-6xl mx-auto px-4 mt-6">
-        <div className="w-full bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 rounded-2xl overflow-hidden shadow-md relative min-h-[220px] flex items-center justify-center p-6 text-center text-white border-4 border-white">
-          <div>
-            <h2 className="text-3xl font-black text-amber-400 drop-shadow-md mb-2 uppercase">
-              Shop Game Duyệt Đơn Siêu Tốc - Siêu Uy Tín #1 Blox Fruits
-            </h2>
-            <p className="text-sm text-sky-200 max-w-md mx-auto">
-              Shop Game Duyệt Đơn Siêu Tốc - Siêu Uy Tín #1 Blox Fruits
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl p-4 border border-sky-100 shadow-sm mt-6 text-xs text-slate-600 leading-relaxed">
-          <p className="font-bold text-slate-800 mb-1">
-            100% Tài khoản ROBLOX đều là account Global (Quốc Tế)
+      <div className="max-w-4xl mx-auto space-y-8">
+        <header className="text-center space-y-2">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-yellow-400">
+            SHOP ROBLOX GIÁ RẺ
+          </h1>
+          <p className="text-gray-400 text-sm md:text-base">
+            Dịch vụ Cày Thuê Blox Fruits Uy Tín & Nhanh Chóng
           </p>
-          <div className="flex flex-wrap gap-2 text-[11px] font-semibold text-sky-600">
-            <span>ACC BLOXFRUIT VIP</span> • <span>ACC BLOXFRUIT V4 Random</span> • <span>CÀY THUÊ</span> • 
-          </div>
-        </div>
+        </header>
 
-        {/* MỤC SẢN PHẨM / TÀI KHOẢN */}
-        <div className="mt-8">
-          <div className="flex items-center justify-center mb-6">
-            <span className="bg-white text-sky-600 border border-sky-200 font-black text-sm px-6 py-2 rounded-full shadow-sm">
-              💻 CỬA HÀNG DỊCH VỤ
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {CATEGORIES.map((cat) => (
-              <div
-                key={cat.id}
-                className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md border border-sky-100 transition-all flex flex-col justify-between p-3"
+        {/* GIAO DIỆN CHỌN DỊCH VỤ VÀ ĐẶT HÀNG */}
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
+          <h2 className="text-xl font-bold text-yellow-400 border-b border-gray-800 pb-3">
+            1. Chọn Dịch Vụ
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {selectedCategory.items.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setSelectedItem(item)}
+                className={`p-4 rounded-xl border text-left transition flex justify-between items-center ${
+                  selectedItem.id === item.id
+                    ? "border-yellow-400 bg-yellow-400/10 text-yellow-400 font-bold"
+                    : "border-gray-800 bg-gray-800/50 text-gray-300 hover:border-gray-700"
+                }`}
               >
-                <div>
-                  <div className="relative rounded-2xl overflow-hidden aspect-[4/3] bg-slate-100 mb-3">
-                    <img
-                      src={cat.image}
-                      alt={cat.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                      <span className="bg-sky-400/90 text-white text-[11px] font-bold px-3 py-1 rounded-full backdrop-blur">
-                        XEM
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="text-center px-2">
-                    <h3 className="font-black text-slate-800 text-sm leading-snug mb-2 min-h-[40px] flex items-center justify-center">
-                      {cat.title}
-                    </h3>
-                    <span className={`inline-block text-xs font-bold px-3 py-1 rounded-full border ${cat.badgeColor} mb-4`}>
-                      {cat.badge}
-                    </span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => {
-                    setSelectedCategory(cat);
-                    setSelectedItemId(cat.items[0].id);
-                  }}
-                  className="w-full py-2.5 bg-[#40c4ff] hover:bg-[#00b0ff] text-white font-extrabold text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-1 active:scale-95 uppercase"
-                >
-                  XEM TẤT CẢ <span className="text-xs">➔</span>
-                </button>
-              </div>
+                <span>{item.name}</span>
+                <span className="text-sm font-semibold text-emerald-400">
+                  {item.price.toLocaleString("vi-VN")} đ
+                </span>
+              </button>
             ))}
           </div>
-        </div>
 
-        {/* MODAL GIAO DIỆN ĐẶT HÀNG / CÀY THUÊ */}
-        {selectedCategory && (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-            <div className="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-sky-100 relative max-h-[90vh] overflow-y-auto my-auto">
-              <button
-                onClick={() => setSelectedCategory(null)}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center hover:bg-slate-200 z-10"
-              >
-                ✕
-              </button>
+          <h2 className="text-xl font-bold text-yellow-400 border-b border-gray-800 pb-3 pt-4">
+            2. Thông Tin Tài Khoản
+          </h2>
 
-              <h3 className="text-xl font-black text-center text-sky-600 mb-6 uppercase tracking-wide">
-                Dịch Vụ - {selectedCategory.title}
-              </h3>
-
-              {/* CHỈ HIỆN FORM NÀY KHI CHỌN MỤC CÀY THUÊ */}
-              {selectedCategory.id === "cay-thue" ? (
-                <div className="space-y-6">
-                  {/* BƯỚC 1: CHỌN GÓI DỊCH VỤ */}
-                  <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
-                        1
-                      </span>
-                      <h4 className="font-bold text-slate-800 text-sm">Chọn Gói Dịch Vụ</h4>
-                    </div>
-                    <select
-                      value={selectedItemId}
-                      onChange={(e) => setSelectedItemId(e.target.value)}
-                      className="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-400"
-                    >
-                      {selectedCategory.items.map((item: any) => (
-                        <option key={item.id} value={item.id}>
-                          {item.name} - {item.price.toLocaleString()} VNĐ
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* BƯỚC 2: THÔNG TIN TÀI KHOẢN */}
-                  <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
-                        2
-                      </span>
-                      <h4 className="font-bold text-slate-800 text-sm">Thông Tin Tài Khoản</h4>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">Tài Khoản</label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-2.5 text-slate-400 text-sm">👤</span>
-                          <input
-                            type="text"
-                            placeholder="Nhập tài khoản cần cày"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            autoComplete="off"
-                            data-lpignore="true"
-                            className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">Mật Khẩu</label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-2.5 text-slate-400 text-sm">🔒</span>
-                          <input
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Nhập mật khẩu của tài khoản đó"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            autoComplete="new-password"
-                            data-lpignore="true"
-                            className="w-full pl-9 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-2.5 text-slate-400 text-xs"
-                          >
-                            {showPassword ? "👁️" : "🙈"}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-4">
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Cookie / 2FA</label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-2.5 text-slate-400 text-sm">🔑</span>
-                        <input
-                          type="text"
-                          placeholder="Có thể nhập chuỗi 2FA, link game pass hoặc cookie liên quan"
-                          value={twoFactor}
-                          onChange={(e) => setTwoFactor(e.target.value)}
-                          autoComplete="off"
-                          data-lpignore="true"
-                          className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400"
-                        />
-                      </div>
-                      <p className="text-[11px] text-slate-400 mt-1">
-                        ℹ️ Dữ liệu này không bắt buộc, có thể bỏ trống
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* BƯỚC 3: GHI CHÚ & XÁC NHẬN */}
-                  <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
-                        3
-                      </span>
-                      <h4 className="font-bold text-slate-800 text-sm">Ghi Chú & Xác Nhận</h4>
-                    </div>
-
-                    <div className="relative">
-                      <textarea
-                        rows={3}
-                        maxLength={500}
-                        placeholder="Nhập ghi chú cho admin nếu có..."
-                        value={note}
-                        onChange={(e) => setNote(e.target.value)}
-                        className="w-full p-3 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400 resize-none"
-                      />
-                      <span className="absolute right-3 bottom-2 text-[10px] text-slate-400">
-                        {note.length} / 500
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                /* GIAO DIỆN CHỌN MUA ĐỐI VỚI CÁC MỤC KHÁC */
-                <div className="space-y-2 mb-6 max-h-[280px] overflow-y-auto pr-1">
-                  {selectedCategory.items.map((item: any) => (
-                    <div
-                      key={item.id}
-                      onClick={() => setSelectedItemId(item.id)}
-                      className={`p-3 rounded-xl border cursor-pointer flex items-center justify-between text-xs transition-all ${
-                        selectedItemId === item.id
-                          ? "bg-sky-50 border-sky-400 text-sky-900 font-bold"
-                          : "bg-slate-50 border-slate-200 text-slate-700"
-                      }`}
-                    >
-                      <span>{item.name}</span>
-                      <span className="text-sky-600 font-black">
-                        {item.price.toLocaleString()} VNĐ
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* NÚT TẠO ĐƠN HÀNG */}
-              <button
-                onClick={handleOrder}
-                className="w-full mt-6 py-3.5 bg-[#40c4ff] hover:bg-[#00b0ff] text-white font-black text-sm rounded-xl shadow-md transition-all uppercase tracking-wide"
-              >
-                XÁC NHẬN ĐẶT HÀNG
-              </button>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                Tên tài khoản Roblox
+              </label>
+              <input
+                type="text"
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-yellow-400"
+                placeholder="Nhập username Roblox"
+              />
             </div>
-          </div>
-        )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                Mật khẩu Roblox
+              </label>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-yellow-400"
+                placeholder="Nhập mật khẩu Roblox"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                Ghi chú thêm (nếu có)
+              </label>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-yellow-400 h-24"
+                placeholder="Mã PIN 2FA, lưu ý đặc biệt..."
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-3 rounded-xl transition shadow-lg shadow-yellow-400/20 disabled:opacity-50"
+            >
+              {loading ? "Đang xử lý..." : `Thanh Toán ${selectedItem.price.toLocaleString("vi-VN")} đ`}
+            </button>
+
+            {message && (
+              <p className="text-center font-medium mt-2">{message}</p>
+            )}
+          </form>
+        </div>
       </div>
     </main>
   );
