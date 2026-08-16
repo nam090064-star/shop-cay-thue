@@ -7,7 +7,7 @@ import { supabase } from "./lib/supabase";
 const CATEGORIES = [
   {
     id: "cay-thue",
-    title: "CÀY THUÊ BLOX-FRUITS",
+    title: "CÀY THUÊ BLOX FRUITS",
     badge: "Sẵn Sàng",
     badgeColor: "bg-emerald-50 text-emerald-600 border-emerald-200",
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQO45TU5JEnlwnzDggYwOifSvWmta1W1xqG03t-4j5Zw&s=10",
