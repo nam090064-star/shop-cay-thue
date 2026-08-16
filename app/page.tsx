@@ -47,22 +47,21 @@ const CATEGORIES = [
     title: "ACC BLOX FRUITS Random V4",
     badge: "Sẵn Sàng",
     badgeColor: "bg-sky-50 text-sky-600 border-sky-200",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSaXYiGiib_06_9V1aIqoHuGh-PokxmCDrCKJPWaDg&s=10",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRT0Ly8DLwNKc5s7LR5ibSeVeXEX6qX0IC_3fZC1S7Pmg&s=10",
     items: [
-      { id: "acc-1", name: "Acc Max Level + Tộc V4 Ngẫu Nhiên", price: 150000 },
-      { id: "acc-2", name: "Acc Max Level + Full Gear V4 Tự Chọn", price: 250000 },
-      { id: "acc-3", name: "Acc VIP CDK + Godhuman + Trái Vĩnh Viễn", price: 350000 },
+      { id: "acc-1", name: "Acc Max Lv + Song Kiếm + 1 Race v4 ngẫu nhiên", price: 50000 },
+      { id: "acc-2", name: "Acc Max Level + Song Kiếm + Guitar Linh Hồn", price: 25000 },
+      { id: "acc-3", name: "Acc Max Level + Song Kiếm + Full Tộc V4", price: 120000 },
     ],
   },
   {
     id: "combo-draco",
-    title: "COMBO DRACO SIÊU VIP",
+    title: "COMBO DRACO Giá Rẻ",
     badge: "Giá Ưu Đãi",
     badgeColor: "bg-rose-50 text-rose-600 border-rose-200",
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkOt5op8NbTeM89SSNJiJAhfNTE9Wle5rCXddf0NfuPw&s=10",
     items: [
-      { id: "draco-1", name: "Combo Draco Tân Thủ: Level 1500 + Tam Kiếm + 5M Beli", price: 99000 },
-      { id: "draco-2", name: "Combo Draco Bá Vương: Max Level + Tộc V4 + CDK", price: 180000 },
+      { id: "draco-1", name: "Combo Cày Thuê Lấy Súng Rồng Kiếm Rồng Tộc Rồng V4 Full Gear", price: 175000 },
     ],
   },
   {
@@ -72,8 +71,7 @@ const CATEGORIES = [
     badgeColor: "bg-amber-50 text-amber-600 border-amber-200",
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQikKJNnW4h7fhv6dpYBqsM_nu5K-zBJMJrJ8qLNYXVg&s=10",
     items: [
-      { id: "v4-1", name: "Mở Khóa Tộc V4 (Chưa Gear)", price: 80000 },
-      { id: "v4-2", name: "Up Full Gear Tộc V4 Thường", price: 150000 },
+      { id: "v4-1", name: "Combo Cày Thuê Lấy Up All Race v4 lên Full Gear (Trừ Rồng)", price: 180000 },
     ],
   },
 ];
