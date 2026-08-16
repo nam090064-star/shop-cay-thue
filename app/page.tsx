@@ -12,10 +12,34 @@ const CATEGORIES = [
     badgeColor: "bg-emerald-50 text-emerald-600 border-emerald-200",
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQO45TU5JEnlwnzDggYwOifSvWmta1W1xqG03t-4j5Zw&s=10",
     items: [
-      { id: "ct-1", name: "Cày Level 1 -> 2550 (Max Level)", price: 50000 },
-      { id: "ct-2", name: "Farm 10.000.000 Beli", price: 30000 },
-      { id: "ct-3", name: "Săn Melee Godhuman", price: 120000 },
-      { id: "ct-4", name: "Săn Cursed Dual Katana (CDK)", price: 100000 },
+      { id: "ct-1", name: "Kéo Tim Levi Về Hydra", price: 35000 },
+      { id: "ct-2", name: "Kéo Tim Levi Về Tiki", price: 30000 },
+      { id: "ct-3", name: "Lấy Tộc Rồng (Bonus V3)", price: 30000 },
+      { id: "ct-4", name: "Cày Trứng Rồng 1 Quả", price: 10000 },
+      { id: "ct-5", name: "Lấy Kiếm Rồng", price: 35000 },
+      { id: "ct-6", name: "Lấy Súng Rồng", price: 40000 },
+      { id: "ct-7", name: "Up Full Gear V4 Tộc Đang Dùng", price: 35000 },
+      { id: "ct-8", name: "Lấy Full Đai Rồng", price: 25000 },
+      { id: "ct-9", name: "Gạt Cần (Điều kiện: Có mảnh và mũ)", price: 20000 },
+      { id: "ct-10", name: "10M Beli", price: 10000 },
+      { id: "ct-11", name: "10K Điểm F", price: 5000 },
+      { id: "ct-12", name: "Lấy Fox Lamp", price: 35000 },
+      { id: "ct-13", name: "Lấy Mỏ Neo", price: 30000 },
+      { id: "ct-14", name: "Lấy Mảnh Gương", price: 20000 },
+      { id: "ct-15", name: "Lấy Mũ Rip Indra", price: 20000 },
+      { id: "ct-16", name: "Lấy Guitar Linh Hồn", price: 30000 },
+      { id: "ct-17", name: "Lấy Song Kiếm CDK", price: 45000 },
+      { id: "ct-18", name: "Lấy Tushita", price: 20000 },
+      { id: "ct-19", name: "Lấy Yama", price: 20000 },
+      { id: "ct-20", name: "Lấy Tam Kiếm ZORO Từ A - Z", price: 45000 },
+      { id: "ct-21", name: "Mua 1 Cây Kiếm ZORO", price: 10000 },
+      { id: "ct-22", name: "Lấy Tộc Cyborg (Bonus V3)", price: 35000 },
+      { id: "ct-23", name: "Lấy Tộc Quỷ (Bonus V3)", price: 35000 },
+      { id: "ct-24", name: "Lấy Haki Quan Sát V2", price: 45000 },
+      { id: "ct-25", name: "Level 1 - MAX", price: 45000 },
+      { id: "ct-26", name: "Level 1500 - MAX", price: 30000 },
+      { id: "ct-27", name: "Level 700 - 1500", price: 20000 },
+      { id: "ct-28", name: "Level 1 - 700", price: 10000 },
     ],
   },
   {
@@ -23,7 +47,7 @@ const CATEGORIES = [
     title: "ACC BLOX FRUITS Random V4",
     badge: "Sẵn Sàng",
     badgeColor: "bg-sky-50 text-sky-600 border-sky-200",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSaXYiIaGiib_06_9V1aIqoHuGh-PokxmCDrCKJPWaDg&s=10",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSaXYiGiib_06_9V1aIqoHuGh-PokxmCDrCKJPWaDg&s=10",
     items: [
       { id: "acc-1", name: "Acc Max Level + Tộc V4 Ngẫu Nhiên", price: 150000 },
       { id: "acc-2", name: "Acc Max Level + Full Gear V4 Tự Chọn", price: 250000 },
@@ -111,7 +135,7 @@ export default function Home() {
         alert("Vui lòng nhập đầy đủ Tài khoản và Mật khẩu Roblox!");
         return;
       }
-      alert(`Đã đặt đơn cày thuê thành công!\nGói: ${item.name}\nTài khoản: ${username}`);
+      alert(`Đã đặt đơn cày thuê thành công!\nGói: ${item.name}\nGiá: ${item.price.toLocaleString()} VNĐ\nTài khoản: ${username}`);
     } else {
       alert(`Đã chọn mua thành công: ${item.name}`);
     }
@@ -281,7 +305,7 @@ export default function Home() {
                     </select>
                   </div>
 
-                  {/* BƯỚC 2: THÔNG TIN TÀI KHOẢN (ĐÃ TẮT TỰ ĐỘNG ĐIỀN) */}
+                  {/* BƯỚC 2: THÔNG TIN TÀI KHOẢN */}
                   <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
                     <div className="flex items-center gap-2 mb-4">
                       <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
