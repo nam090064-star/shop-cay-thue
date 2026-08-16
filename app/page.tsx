@@ -54,15 +54,6 @@ const CATEGORIES = [
   },
 ];
 
-// TOP NẠP THÁNG
-const TOP_NAP = [
-  { rank: 1, name: "huy****", amount: "1.710.000 đ", color: "text-amber-500 font-bold" },
-  { rank: 2, name: "duy****", amount: "1.500.000 đ", color: "text-slate-400 font-bold" },
-  { rank: 3, name: "Dun*****", amount: "1.170.000 đ", color: "text-amber-700 font-bold" },
-  { rank: 4, name: "ngu**********", amount: "1.098.000 đ", color: "text-rose-500 font-bold" },
-  { rank: 5, name: "Ima******", amount: "950.000 đ", color: "text-rose-500 font-bold" },
-];
-
 export default function Home() {
   const [session, setSession] = useState<any>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -105,7 +96,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="bg-sky-500 text-white p-2 rounded-xl font-black text-xl tracking-wider">
-              SHOPSONB.COM
+              RobloxGiaRe.Com
             </div>
           </div>
 
@@ -135,45 +126,15 @@ export default function Home() {
 
       {/* BODY CONTENT */}
       <div className="max-w-6xl mx-auto px-4 mt-6">
-        {/* BANNER HÀNG ĐẦU & TOP NẠP */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* BANNER TRÁI */}
-          <div className="lg:col-span-2 bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 rounded-2xl overflow-hidden shadow-md relative min-h-[260px] flex items-center justify-center p-6 text-center text-white border-4 border-white">
-            <div>
-              <h2 className="text-3xl font-black text-amber-400 drop-shadow-md mb-2 uppercase">
-                SHOPEVIL & SHOPSONB.COM
-              </h2>
-              <p className="text-sm text-sky-200 max-w-md mx-auto">
-                Shop Game Duyệt Đơn Siêu Tốc - Siêu Uy Tín #1 Blox Fruits
-              </p>
-            </div>
-          </div>
-
-          {/* TOP NẠP PHẢI */}
-          <div className="bg-white rounded-2xl shadow-sm border border-sky-100 overflow-hidden flex flex-col justify-between">
-            <div>
-              <div className="bg-sky-500 text-white font-black text-center py-3 text-sm tracking-wide uppercase flex items-center justify-center gap-2">
-                🏆 TOP NẠP THÁNG 08/2026
-              </div>
-              <div className="p-4 space-y-3">
-                {TOP_NAP.map((item) => (
-                  <div key={item.rank} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="w-5 h-5 rounded-full bg-sky-100 text-sky-700 font-black flex items-center justify-center text-[10px]">
-                        {item.rank}
-                      </span>
-                      <span className="font-semibold text-slate-700">{item.name}</span>
-                    </div>
-                    <span className={item.color}>{item.amount}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="p-3 pt-0">
-              <button className="w-full py-2 bg-sky-400 hover:bg-sky-500 text-white font-bold text-xs rounded-xl shadow transition-all uppercase">
-                👉 NẠP TIỀN NGAY 👈
-              </button>
-            </div>
+        {/* BANNER HÀNG ĐẦU (ĐÃ XÓA TOP NẠP, TRÀN FULL CHIỀU RỘNG) */}
+        <div className="w-full bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 rounded-2xl overflow-hidden shadow-md relative min-h-[220px] flex items-center justify-center p-6 text-center text-white border-4 border-white">
+          <div>
+            <h2 className="text-3xl font-black text-amber-400 drop-shadow-md mb-2 uppercase">
+              SHOPEVIL & SHOPSONB.COM
+            </h2>
+            <p className="text-sm text-sky-200 max-w-md mx-auto">
+              Shop Game Duyệt Đơn Siêu Tốc - Siêu Uy Tín #1 Blox Fruits
+            </p>
           </div>
         </div>
 
@@ -187,7 +148,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* MỤC SẢN PHẨM / TÀI KHOẢN (GIAO DIỆN CHUẨN ANH CHỤP) */}
+        {/* MỤC SẢN PHẨM / TÀI KHOẢN */}
         <div className="mt-8">
           <div className="flex items-center justify-center mb-6">
             <span className="bg-white text-sky-600 border border-sky-200 font-black text-sm px-6 py-2 rounded-full shadow-sm">
@@ -202,7 +163,6 @@ export default function Home() {
                 className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md border border-sky-100 transition-all flex flex-col justify-between p-3"
               >
                 <div>
-                  {/* HÌNH ẢNH CÓ NÚT XEM */}
                   <div className="relative rounded-2xl overflow-hidden aspect-[4/3] bg-slate-100 mb-3">
                     <img
                       src={cat.image}
@@ -216,7 +176,6 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* TIÊU ĐỀ & BADGE */}
                   <div className="text-center px-2">
                     <h3 className="font-black text-slate-800 text-sm leading-snug mb-2 min-h-[40px] flex items-center justify-center">
                       {cat.title}
@@ -227,7 +186,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* NÚT XEM TẤT CẢ (XANH CYAN CHUẨN HÌNH) */}
                 <button
                   onClick={() => {
                     setSelectedCategory(cat);
@@ -245,7 +203,7 @@ export default function Home() {
         {/* MODAL MUA HÀNG KHI BẤM XEM TẤT CẢ */}
         {selectedCategory && (
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-sky-100 relative animate-in fade-in zoom-in duration-200">
+            <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-sky-100 relative">
               <button
                 onClick={() => setSelectedCategory(null)}
                 className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center hover:bg-slate-200"
