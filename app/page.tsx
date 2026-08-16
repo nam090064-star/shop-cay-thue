@@ -93,6 +93,12 @@ export default function Home() {
     }
   };
 
+  // Hàm xử lý Đăng xuất
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    alert("Đã đăng xuất thành công!");
+  };
+
   const handleOrder = () => {
     const item = selectedCategory.items.find((i: any) => i.id === selectedItemId);
     if (!item) {
@@ -127,7 +133,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Nút bật/tắt Nhạc Chill */}
             <button
               onClick={toggleMusic}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm border ${
@@ -139,11 +146,23 @@ export default function Home() {
               <span>{isPlaying ? "🎵 Đang phát nhạc" : "🔇 Bật nhạc chill"}</span>
             </button>
 
+            {/* Khối Tài khoản & Đăng xuất */}
             <div className="bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold text-sky-700">
               <span className="w-6 h-6 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-bold">
                 👤
               </span>
               <span>{session ? session.user.email : "Khách - 0 đ"}</span>
+
+              {/* Nút Đăng xuất chỉ hiển thị khi đã đăng nhập */}
+              {session && (
+                <button
+                  onClick={handleLogout}
+                  className="ml-1 px-2 py-0.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-[10px] font-extrabold transition-all shadow-sm"
+                  title="Đăng xuất"
+                >
+                  Đăng xuất
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -262,7 +281,7 @@ export default function Home() {
                     </select>
                   </div>
 
-                  {/* BƯỚC 2: THÔNG TIN TÀI KHOẢN */}
+                  {/* BƯỚC 2: THÔNG TIN TÀI KHOẢN (ĐÃ TẮT TỰ ĐỘNG ĐIỀN) */}
                   <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
                     <div className="flex items-center gap-2 mb-4">
                       <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
@@ -281,6 +300,8 @@ export default function Home() {
                             placeholder="Nhập tài khoản cần cày"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
+                            autoComplete="off"
+                            data-lpignore="true"
                             className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400"
                           />
                         </div>
@@ -295,6 +316,8 @@ export default function Home() {
                             placeholder="Nhập mật khẩu của tài khoản đó"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            autoComplete="new-password"
+                            data-lpignore="true"
                             className="w-full pl-9 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400"
                           />
                           <button
@@ -317,6 +340,8 @@ export default function Home() {
                           placeholder="Có thể nhập chuỗi 2FA, link game pass hoặc cookie liên quan"
                           value={twoFactor}
                           onChange={(e) => setTwoFactor(e.target.value)}
+                          autoComplete="off"
+                          data-lpignore="true"
                           className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400"
                         />
                       </div>
