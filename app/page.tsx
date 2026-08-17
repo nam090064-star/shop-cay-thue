@@ -84,6 +84,7 @@ const CATEGORIES = [
 
 export default function Home() {
   const [session, setSession] = useState<any>(null);
+  const [balance, setBalance] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [selectedItemId, setSelectedItemId] = useState<string>("");
@@ -103,15 +104,35 @@ export default function Home() {
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // LẤY SỐ DƯ TÀI KHOẢN TỪ SUPABASE
+  const fetchUserBalance = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("balance")
+        .eq("id", userId)
+        .single();
+
+      if (data && !error) {
+        setBalance(data.balance || 0);
+      }
+    } catch (err) {
+      console.error("Lỗi lấy số dư:", err);
+    }
+  };
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      if (session?.user) fetchUserBalance(session.user.id);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (session?.user) fetchUserBalance(session.user.id);
+      else setBalance(0);
     });
 
     return () => subscription.unsubscribe();
@@ -139,7 +160,6 @@ export default function Home() {
   const openHistory = (tab: "orders" | "deposits") => {
     setHistoryTab(tab);
     if (tab === "orders") {
-      // Dữ liệu mẫu (hoặc fetch từ Supabase)
       setOrdersHistory([
         { id: "ORD-01", service: "Level 1500 - MAX", price: 30000, status: "Đang xử lý", date: "17/08/2026" },
       ]);
@@ -150,12 +170,25 @@ export default function Home() {
     }
   };
 
+  // HÀM ĐẶT HÀNG ĐÃ TÍCH HỢP CHECK SỐ DƯ & TRỪ TIỀN
   const handleOrder = async () => {
     if (isSubmitting) return;
+
+    // 1. Kiểm tra đăng nhập
+    if (!session?.user) {
+      alert("Vui lòng đăng nhập tài khoản trước khi đặt hàng!");
+      return;
+    }
 
     const item = selectedCategory.items.find((i: any) => i.id === selectedItemId);
     if (!item) {
       alert("Vui lòng chọn gói dịch vụ!");
+      return;
+    }
+
+    // 2. KIỂM TRA SỐ DƯ TÀI KHOẢN
+    if (balance < item.price) {
+      alert(`Số dư của bạn không đủ (${balance.toLocaleString()} VNĐ). Vui lòng nạp thêm tiền để thanh toán gói ${item.price.toLocaleString()} VNĐ!`);
       return;
     }
 
@@ -167,23 +200,41 @@ export default function Home() {
 
     setIsSubmitting(true);
 
-    let message = `🛒 *ĐƠN HÀNG MỚI TỪ WEBSITE*\n\n`;
-    message += `📌 *Danh mục:* ${selectedCategory.title}\n`;
-    message += `📦 *Gói dịch vụ:* ${item.name}\n`;
-    message += `💰 *Giá tiền:* ${item.price.toLocaleString()} VNĐ\n`;
-    message += `👤 *Khách hàng (Email):* ${session?.user?.email || "Khách vãng lai"}\n`;
-
-    if (requireAccount || username || password) {
-      message += `\n🔑 *THÔNG TIN TÀI KHOẢN:* \n`;
-      message += `• *Tài khoản:* \`${username}\`\n`;
-      message += `• *Mật khẩu:* \`${password}\`\n`;
-      if (twoFactor) message += `• *2FA/Cookie:* \`${twoFactor}\`\n`;
-      if (note) message += `• *Ghi chú:* ${note}\n`;
-    }
-
-    message += `\n⏰ *Thời gian:* ${new Date().toLocaleString("vi-VN")}`;
-
     try {
+      // 3. TRỪ TIỀN NGUỜI DÙNG TRONG SUPABASE
+      const newBalance = balance - item.price;
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ balance: newBalance })
+        .eq("id", session.user.id);
+
+      if (updateError) {
+        alert("Không thể thực hiện giao dịch. Vui lòng thử lại!");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Cập nhật lại số dư trên màn hình
+      setBalance(newBalance);
+
+      // 4. GỬI THÔNG BÁO VỀ TELEGRAM BOT
+      let message = `🛒 *ĐƠN HÀNG MỚI TỪ WEBSITE*\n\n`;
+      message += `📌 *Danh mục:* ${selectedCategory.title}\n`;
+      message += `📦 *Gói dịch vụ:* ${item.name}\n`;
+      message += `💰 *Giá tiền:* ${item.price.toLocaleString()} VNĐ\n`;
+      message += `👤 *Khách hàng (Email):* ${session?.user?.email}\n`;
+      message += `💵 *Số dư còn lại:* ${newBalance.toLocaleString()} VNĐ\n`;
+
+      if (requireAccount || username || password) {
+        message += `\n🔑 *THÔNG TIN TÀI KHOẢN:* \n`;
+        message += `• *Tài khoản:* \`${username}\`\n`;
+        message += `• *Mật khẩu:* \`${password}\`\n`;
+        if (twoFactor) message += `• *2FA/Cookie:* \`${twoFactor}\`\n`;
+        if (note) message += `• *Ghi chú:* ${note}\n`;
+      }
+
+      message += `\n⏰ *Thời gian:* ${new Date().toLocaleString("vi-VN")}`;
+
       const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -195,17 +246,17 @@ export default function Home() {
       });
 
       if (response.ok) {
-        alert("Đặt hàng thành công! Đơn hàng đã được gửi tới hệ thống xử lý.");
+        alert("Đặt hàng thành công! Đơn hàng đã được ghi nhận và đang tiến hành xử lý.");
         setSelectedCategory(null);
         setUsername("");
         setPassword("");
         setTwoFactor("");
         setNote("");
       } else {
-        alert("Có lỗi xảy ra khi gửi đơn hàng. Vui lòng kiểm tra lại Token & Chat ID!");
+        alert("Đặt hàng thành công và đã trừ tiền, nhưng có lỗi gửi thông báo Telegram.");
       }
     } catch (error) {
-      alert("Có lỗi xảy ra khi kết nối. Vui lòng thử lại!");
+      alert("Có lỗi xảy ra khi xử lý đơn hàng. Vui lòng liên hệ Admin!");
     } finally {
       setIsSubmitting(false);
     }
@@ -255,7 +306,9 @@ export default function Home() {
               <span className="w-6 h-6 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-bold">
                 👤
               </span>
-              <span>{session ? session.user.email : "Khách - 0 đ"}</span>
+              <span>
+                {session ? `${session.user.email} - ${balance.toLocaleString()} đ` : "Khách - 0 đ"}
+              </span>
 
               {session && (
                 <button
