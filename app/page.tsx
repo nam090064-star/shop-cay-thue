@@ -50,31 +50,29 @@ const CATEGORIES = [
     badgeColor: "bg-sky-50 text-sky-600 border-sky-200",
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM70JKMiGwF3sogwyhZ70TNqtWl1wdloQlq0t81bzMfQ&s",
     items: [
-      { id: "acc-1", name: "Acc Max Level + Tộc V4 Ngẫu Nhiên", price: 150000 },
-      { id: "acc-2", name: "Acc Max Level + Full Gear V4 Tự Chọn", price: 250000 },
-      { id: "acc-3", name: "Acc VIP CDK + Godhuman + Trái Vĩnh Viễn", price: 350000 },
+      { id: "acc-1", name: "Acc Max Lv + CDK + 1 Race V4 Ngẫu Nhiên", price: 45000 },
+      { id: "acc-2", name: "Acc Max Lv + 1 Race V4 Ngẫu Nhiên", price: 30000 },
+      { id: "acc-3", name: "Acc Max Lv + CDK + Guitar Linh Hồn + Full Race V4 (Trừ Rồng)", price: 130000 },
     ],
   },
   {
     id: "combo-draco",
-    title: "COMBO DRACO SIÊU VIP",
+    title: "Gói Cày DRACO Giá Rẻ",
     badge: "Giá Ưu Đãi",
     badgeColor: "bg-rose-50 text-rose-600 border-rose-200",
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkOt5op8NbTeM89SSNJiJAhfNTE9Wle5rCXddf0NfuPw&s=10",
     items: [
-      { id: "draco-1", name: "Combo Draco Tân Thủ: Level 1500 + Tam Kiếm + 5M Beli", price: 99000 },
-      { id: "draco-2", name: "Combo Draco Bá Vương: Max Level + Tộc V4 + CDK", price: 180000 },
+      { id: "draco-1", name: "Lấy Súng Rồng + Kiếm Rồng + Tộc Rồng Up Full Gear", price: 180000 },
     ],
   },
   {
     id: "race-v4",
-    title: "FULL RACE V4 THƯỜNG",
+    title: "Gói Cày Thuê Full Tộc V4",
     badge: "Ưu Đãi",
     badgeColor: "bg-amber-50 text-amber-600 border-amber-200",
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQikKJNnW4h7fhv6dpYBqsM_nu5K-zBJMJrJ8qLNYXVg&s=10",
     items: [
-      { id: "v4-1", name: "Mở Khóa Tộc V4 (Chưa Gear)", price: 80000 },
-      { id: "v4-2", name: "Up Full Gear Tộc V4 Thường", price: 150000 },
+      { id: "v4-1", name: "Up ALL Race Lên V4 Full Gear (Trừ Rồng) Bao Điểm F + Gạt Cần", price: 180000 },
     ],
   },
 ];
