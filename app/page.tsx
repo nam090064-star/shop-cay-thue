@@ -7,8 +7,8 @@ import NoticeModal from "./components/NoticeModal";
 // ========================================================
 // ⚠️ THAY THÔNG TIN TELEGRAM BOT CỦA BẠN VÀO 2 DÒNG DƯỚI ĐÂY
 // ========================================================
-const TELEGRAM_BOT_TOKEN = "8874478983:AAFWJMUFfE0Ymr_ByLmS40qs3VjSRqu2aa8";
-const TELEGRAM_CHAT_ID = "6966144660";
+const TELEGRAM_BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN";
+const TELEGRAM_CHAT_ID = "YOUR_TELEGRAM_CHAT_ID";
 
 // DỮ LIỆU CÁC MỤC DỊCH VỤ / TÀI KHOẢN
 const CATEGORIES = [
@@ -88,6 +88,7 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [selectedItemId, setSelectedItemId] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // State cho Form Cày Thuê
   const [username, setUsername] = useState("");
@@ -127,18 +128,28 @@ export default function Home() {
     alert("Đã đăng xuất thành công!");
   };
 
+  // KIỂM TRA XEM HẠNG MỤC CÓ CẦN NHẬP TÀI KHOẢN HAY KHÔNG (DỊCH VỤ CÀY THUÊ)
+  const isServiceCategory = (catId: string) => {
+    return ["cay-thue", "combo-draco", "race-v4"].includes(catId);
+  };
+
   // HÀM XỬ LÝ ĐẶT HÀNG VÀ GỬI THÔNG BÁO VỀ TELEGRAM BOT
   const handleOrder = async () => {
+    if (isSubmitting) return;
+
     const item = selectedCategory.items.find((i: any) => i.id === selectedItemId);
     if (!item) {
       alert("Vui lòng chọn gói dịch vụ!");
       return;
     }
 
-    if (selectedCategory.id === "cay-thue" && (!username || !password)) {
+    const requireAccount = isServiceCategory(selectedCategory.id);
+    if (requireAccount && (!username || !password)) {
       alert("Vui lòng nhập đầy đủ Tài khoản và Mật khẩu Roblox!");
       return;
     }
+
+    setIsSubmitting(true);
 
     // Soạn nội dung thông báo Telegram
     let message = `🛒 *ĐƠN HÀNG MỚI TỪ WEBSITE*\n\n`;
@@ -147,7 +158,8 @@ export default function Home() {
     message += `💰 *Giá tiền:* ${item.price.toLocaleString()} VNĐ\n`;
     message += `👤 *Khách hàng (Email):* ${session?.user?.email || "Khách vãng lai"}\n`;
 
-    if (selectedCategory.id === "cay-thue") {
+    // Luôn đính kèm thông tin tài khoản nếu là gói cày thuê / combo
+    if (requireAccount || username || password) {
       message += `\n🔑 *THÔNG TIN TÀI KHOẢN:* \n`;
       message += `• *Tài khoản:* \`${username}\`\n`;
       message += `• *Mật khẩu:* \`${password}\`\n`;
@@ -158,7 +170,6 @@ export default function Home() {
     message += `\n⏰ *Thời gian:* ${new Date().toLocaleString("vi-VN")}`;
 
     try {
-      // Gửi HTTP Request tới Telegram Bot API
       const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -179,13 +190,14 @@ export default function Home() {
         setTwoFactor("");
         setNote("");
       } else {
-         console.error("Lỗi từ Telegram API:", await response.text());
-         alert("Có lỗi xảy ra khi gửi đơn hàng. Vui lòng thử lại sau!");
+        console.error("Lỗi từ Telegram API:", await response.text());
+        alert("Có lỗi xảy ra khi gửi đơn hàng. Vui lòng kiểm tra lại Token & Chat ID!");
       }
-
     } catch (error) {
       console.error("Lỗi khi gửi đơn hàng Telegram:", error);
       alert("Có lỗi xảy ra khi kết nối. Vui lòng thử lại!");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -324,28 +336,30 @@ export default function Home() {
                 Dịch Vụ - {selectedCategory.title}
               </h3>
 
-              {selectedCategory.id === "cay-thue" ? (
-                <div className="space-y-6">
-                  <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
-                        1
-                      </span>
-                      <h4 className="font-bold text-slate-800 text-sm">Chọn Gói Dịch Vụ</h4>
-                    </div>
-                    <select
-                      value={selectedItemId}
-                      onChange={(e) => setSelectedItemId(e.target.value)}
-                      className="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-400"
-                    >
-                      {selectedCategory.items.map((item: any) => (
-                        <option key={item.id} value={item.id}>
-                          {item.name} - {item.price.toLocaleString()} VNĐ
-                        </option>
-                      ))}
-                    </select>
+              <div className="space-y-6">
+                {/* 1. CHỌN GÓI DỊCH VỤ */}
+                <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
+                      1
+                    </span>
+                    <h4 className="font-bold text-slate-800 text-sm">Chọn Gói Dịch Vụ</h4>
                   </div>
+                  <select
+                    value={selectedItemId}
+                    onChange={(e) => setSelectedItemId(e.target.value)}
+                    className="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                  >
+                    {selectedCategory.items.map((item: any) => (
+                      <option key={item.id} value={item.id}>
+                        {item.name} - {item.price.toLocaleString()} VNĐ
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
+                {/* 2. NHẬP THÔNG TIN TÀI KHOẢN (ÁP DỤNG CHO TẤT CẢ GÓI CÀY THUÊ & COMBO) */}
+                {isServiceCategory(selectedCategory.id) && (
                   <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
                     <div className="flex items-center gap-2 mb-4">
                       <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
@@ -414,56 +428,43 @@ export default function Home() {
                       </p>
                     </div>
                   </div>
+                )}
 
-                  <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
-                        3
-                      </span>
-                      <h4 className="font-bold text-slate-800 text-sm">Ghi Chú & Xác Nhận</h4>
-                    </div>
+                {/* 3. GHI CHÚ KHÁCH HÀNG */}
+                <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
+                      {isServiceCategory(selectedCategory.id) ? "3" : "2"}
+                    </span>
+                    <h4 className="font-bold text-slate-800 text-sm">Ghi Chú & Xác Nhận</h4>
+                  </div>
 
-                    <div className="relative">
-                      <textarea
-                        rows={3}
-                        maxLength={500}
-                        placeholder="Nhập ghi chú cho admin nếu có..."
-                        value={note}
-                        onChange={(e) => setNote(e.target.value)}
-                        className="w-full p-3 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400 resize-none"
-                      />
-                      <span className="absolute right-3 bottom-2 text-[10px] text-slate-400">
-                        {note.length} / 500
-                      </span>
-                    </div>
+                  <div className="relative">
+                    <textarea
+                      rows={3}
+                      maxLength={500}
+                      placeholder="Nhập ghi chú cho admin nếu có..."
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                      className="w-full p-3 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400 resize-none"
+                    />
+                    <span className="absolute right-3 bottom-2 text-[10px] text-slate-400">
+                      {note.length} / 500
+                    </span>
                   </div>
                 </div>
-              ) : (
-                <div className="space-y-2 mb-6 max-h-[280px] overflow-y-auto pr-1">
-                  {selectedCategory.items.map((item: any) => (
-                    <div
-                      key={item.id}
-                      onClick={() => setSelectedItemId(item.id)}
-                      className={`p-3 rounded-xl border cursor-pointer flex items-center justify-between text-xs transition-all ${
-                        selectedItemId === item.id
-                          ? "bg-sky-50 border-sky-400 text-sky-900 font-bold"
-                          : "bg-slate-50 border-slate-200 text-slate-700"
-                      }`}
-                    >
-                      <span>{item.name}</span>
-                      <span className="text-sky-600 font-black">
-                        {item.price.toLocaleString()} VNĐ
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
+              </div>
 
               <button
+                disabled={isSubmitting}
                 onClick={handleOrder}
-                className="w-full mt-6 py-3.5 bg-[#40c4ff] hover:bg-[#00b0ff] text-white font-black text-sm rounded-xl shadow-md transition-all uppercase tracking-wide"
+                className={`w-full mt-6 py-3.5 text-white font-black text-sm rounded-xl shadow-md transition-all uppercase tracking-wide ${
+                  isSubmitting
+                    ? "bg-slate-400 cursor-not-allowed"
+                    : "bg-[#40c4ff] hover:bg-[#00b0ff] active:scale-98"
+                }`}
               >
-                XÁC NHẬN ĐẶT HÀNG
+                {isSubmitting ? "ĐANG XỬ LÝ..." : "XÁC NHẬN ĐẶT HÀNG"}
               </button>
             </div>
           </div>
