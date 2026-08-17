@@ -149,9 +149,11 @@ export default function Home() {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    alert("Đã đăng xuất thành công!");
-  };
+  await supabase.auth.signOut();
+  setSession(null);
+  setBalance(0);
+  alert("Đã đăng xuất thành công!");
+};
 
   const isServiceCategory = (catId: string) => {
     return ["cay-thue", "combo-draco", "race-v4"].includes(catId);
@@ -270,13 +272,15 @@ export default function Home() {
       {/* HEADER NAVBAR */}
 <header className="bg-white border-b border-sky-100 sticky top-0 z-50 px-4 py-3 shadow-sm">
   <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+    {/* LOGO */}
     <div className="flex items-center gap-3">
-      <div className="bg-sky-500 text-white p-2 rounded-xl font-black text-xl tracking-wider">
+      <div className="bg-sky-500 text-white px-3 py-1.5 rounded-xl font-black text-xl tracking-wider">
         RobloxGiaRe.Com
       </div>
     </div>
 
-    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+    {/* MENU NÚT BẤM */}
+    <div className="flex flex-wrap items-center gap-2">
       <button
         onClick={() => openHistory("orders")}
         className="px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all border border-slate-200"
@@ -293,7 +297,7 @@ export default function Home() {
 
       <button
         onClick={toggleMusic}
-        className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm border ${
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm border ${
           isPlaying
             ? "bg-emerald-50 text-emerald-600 border-emerald-200 animate-pulse"
             : "bg-slate-100 text-slate-600 border-slate-200"
@@ -302,29 +306,26 @@ export default function Home() {
         <span>{isPlaying ? "🎵 Đang phát" : "🔇 Bật nhạc"}</span>
       </button>
 
-      {/* KHU VỰC TÀI KHOẢN & ĐĂNG XUẤT */}
-      {session ? (
-        <div className="flex items-center gap-2">
-          <div className="bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold text-sky-700">
-            <span className="w-6 h-6 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-bold">
-              👤
-            </span>
-            <span>
-              {session.user.email} - <span className="text-emerald-600">{balance.toLocaleString()} đ</span>
-            </span>
-          </div>
+      {/* HIỂN THỊ THÔNG TIN USER */}
+      <div className="bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold text-sky-700">
+        <span className="w-5 h-5 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-bold text-[10px]">
+          👤
+        </span>
+        <span>
+          {session?.user?.email ? session.user.email : "Khách"} -{" "}
+          <span className="text-emerald-600 font-extrabold">{balance.toLocaleString()} đ</span>
+        </span>
+      </div>
 
-          <button
-            onClick={handleLogout}
-            className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-xs font-extrabold transition-all shadow-sm active:scale-95 cursor-pointer"
-          >
-            Đăng xuất
-          </button>
-        </div>
-      ) : (
-        <div className="bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-full text-xs font-bold text-slate-600">
-          👤 Khách - 0 đ
-        </div>
+      {/* NÚT ĐĂNG XUẤT HIỂN THỊ KHI CÓ USER */}
+      {session && (
+        <button
+          onClick={handleLogout}
+          type="button"
+          className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-xs font-black shadow-sm transition-all active:scale-95 cursor-pointer z-10"
+        >
+          Đăng xuất
+        </button>
       )}
     </div>
   </div>
