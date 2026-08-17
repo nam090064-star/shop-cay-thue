@@ -150,18 +150,32 @@ export default function Home() {
 
   const handleLogout = async () => {
   try {
-    // 1. Đăng xuất tài khoản khỏi Supabase
+    // 1. Gọi API đăng xuất của Supabase
     await supabase.auth.signOut();
-  } catch (error) {
-    console.error("Lỗi đăng xuất:", error);
-  } finally {
-    // 2. Xóa sạch dữ liệu lưu tạm ở trình duyệt
+
+    // 2. Xóa sạch LocalStorage và SessionStorage
     if (typeof window !== "undefined") {
       localStorage.clear();
       sessionStorage.clear();
-      // 3. Tải lại trang chủ để đưa về trạng thái khách ban đầu
+
+      // 3. Xóa toàn bộ Cookie (bao gồm sb-access-token, sb-refresh-token)
+      document.cookie.split(";").forEach((c) => {
+        document.cookie = c
+          .replace(/^ +/, "")
+          .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+      });
+
+      // 4. Cập nhật State giao diện ngay lập tức
+      setSession(null);
+      setBalance(0);
+
+      // 5. Chuyển hướng trang và làm mới hoàn toàn
       window.location.href = "/";
     }
+  } catch (error) {
+    console.error("Lỗi đăng xuất:", error);
+    // Nếu có lỗi vẫn ép tải lại trang để thoát Session cũ
+    window.location.href = "/";
   }
 };
 
