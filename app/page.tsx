@@ -268,60 +268,67 @@ export default function Home() {
       <audio ref={audioRef} src="/nhacchill.mp3" loop preload="auto" />
 
       {/* HEADER NAVBAR */}
-      <header className="bg-white border-b border-sky-100 sticky top-0 z-50 px-4 py-3 shadow-sm">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="bg-sky-500 text-white p-2 rounded-xl font-black text-xl tracking-wider">
-              RobloxGiaRe.Com
-            </div>
+<header className="bg-white border-b border-sky-100 sticky top-0 z-50 px-4 py-3 shadow-sm">
+  <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+    <div className="flex items-center gap-3">
+      <div className="bg-sky-500 text-white p-2 rounded-xl font-black text-xl tracking-wider">
+        RobloxGiaRe.Com
+      </div>
+    </div>
+
+    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+      <button
+        onClick={() => openHistory("orders")}
+        className="px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all border border-slate-200"
+      >
+        📋 Lịch Sử Đặt Hàng
+      </button>
+
+      <button
+        onClick={() => openHistory("deposits")}
+        className="px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all border border-slate-200"
+      >
+        💳 Lịch Sử Nạp Tiền
+      </button>
+
+      <button
+        onClick={toggleMusic}
+        className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm border ${
+          isPlaying
+            ? "bg-emerald-50 text-emerald-600 border-emerald-200 animate-pulse"
+            : "bg-slate-100 text-slate-600 border-slate-200"
+        }`}
+      >
+        <span>{isPlaying ? "🎵 Đang phát" : "🔇 Bật nhạc"}</span>
+      </button>
+
+      {/* KHU VỰC TÀI KHOẢN & ĐĂNG XUẤT */}
+      {session ? (
+        <div className="flex items-center gap-2">
+          <div className="bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold text-sky-700">
+            <span className="w-6 h-6 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-bold">
+              👤
+            </span>
+            <span>
+              {session.user.email} - <span className="text-emerald-600">{balance.toLocaleString()} đ</span>
+            </span>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button
-              onClick={() => openHistory("orders")}
-              className="px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all border border-slate-200"
-            >
-              📋 Lịch Sử Đặt Hàng
-            </button>
-
-            <button
-              onClick={() => openHistory("deposits")}
-              className="px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all border border-slate-200"
-            >
-              💳 Lịch Sử Nạp Tiền
-            </button>
-
-            <button
-              onClick={toggleMusic}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm border ${
-                isPlaying
-                  ? "bg-emerald-50 text-emerald-600 border-emerald-200 animate-pulse"
-                  : "bg-slate-100 text-slate-600 border-slate-200"
-              }`}
-            >
-              <span>{isPlaying ? "🎵 Đang phát" : "🔇 Bật nhạc"}</span>
-            </button>
-
-            <div className="bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold text-sky-700">
-              <span className="w-6 h-6 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-bold">
-                👤
-              </span>
-              <span>
-                {session ? `${session.user.email} - ${balance.toLocaleString()} đ` : "Khách - 0 đ"}
-              </span>
-
-              {session && (
-                <button
-                  onClick={handleLogout}
-                  className="ml-1 px-2 py-0.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-[10px] font-extrabold transition-all shadow-sm"
-                >
-                  Đăng xuất
-                </button>
-              )}
-            </div>
-          </div>
+          <button
+            onClick={handleLogout}
+            className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-xs font-extrabold transition-all shadow-sm active:scale-95 cursor-pointer"
+          >
+            Đăng xuất
+          </button>
         </div>
-      </header>
+      ) : (
+        <div className="bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-full text-xs font-bold text-slate-600">
+          👤 Khách - 0 đ
+        </div>
+      )}
+    </div>
+  </div>
+</header>
 
       {/* BODY CONTENT */}
       <div className="max-w-6xl mx-auto px-4 mt-6">
