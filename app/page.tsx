@@ -4,6 +4,12 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "./lib/supabase";
 import NoticeModal from "./components/NoticeModal";
 
+// ========================================================
+// ⚠️ THAY THÔNG TIN TELEGRAM BOT CỦA BẠN VÀO 2 DÒNG DƯỚI ĐÂY
+// ========================================================
+const TELEGRAM_BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN";
+const TELEGRAM_CHAT_ID = "YOUR_TELEGRAM_CHAT_ID";
+
 // DỮ LIỆU CÁC MỤC DỊCH VỤ / TÀI KHOẢN
 const CATEGORIES = [
   {
@@ -116,38 +122,76 @@ export default function Home() {
     }
   };
 
-  // Hàm xử lý Đăng xuất
   const handleLogout = async () => {
     await supabase.auth.signOut();
     alert("Đã đăng xuất thành công!");
   };
 
-  const handleOrder = () => {
+  // HÀM XỬ LÝ ĐẶT HÀNG VÀ GỬI THÔNG BÁO VỀ TELEGRAM BOT
+  const handleOrder = async () => {
     const item = selectedCategory.items.find((i: any) => i.id === selectedItemId);
     if (!item) {
       alert("Vui lòng chọn gói dịch vụ!");
       return;
     }
 
-    if (selectedCategory.id === "cay-thue") {
-      if (!username || !password) {
-        alert("Vui lòng nhập đầy đủ Tài khoản và Mật khẩu Roblox!");
-        return;
-      }
-      alert(`Đã đặt đơn cày thuê thành công!\nGói: ${item.name}\nGiá: ${item.price.toLocaleString()} VNĐ\nTài khoản: ${username}`);
-    } else {
-      alert(`Đã chọn mua thành công: ${item.name}`);
+    if (selectedCategory.id === "cay-thue" && (!username || !password)) {
+      alert("Vui lòng nhập đầy đủ Tài khoản và Mật khẩu Roblox!");
+      return;
     }
 
-    setSelectedCategory(null);
+    // Soạn nội dung thông báo Telegram
+    let message = `🛒 *ĐƠN HÀNG MỚI TỪ WEBSITE*\n\n`;
+    message += `📌 *Danh mục:* ${selectedCategory.title}\n`;
+    message += `📦 *Gói dịch vụ:* ${item.name}\n`;
+    message += `💰 *Giá tiền:* ${item.price.toLocaleString()} VNĐ\n`;
+    message += `👤 *Khách hàng (Email):* ${session?.user?.email || "Khách vãng lai"}\n`;
+
+    if (selectedCategory.id === "cay-thue") {
+      message += `\n🔑 *THÔNG TIN TÀI KHOẢN:* \n`;
+      message += `• *Tài khoản:* \`${username}\`\n`;
+      message += `• *Mật khẩu:* \`${password}\`\n`;
+      if (twoFactor) message += `• *2FA/Cookie:* \`${twoFactor}\`\n`;
+      if (note) message += `• *Ghi chú:* ${note}\n`;
+    }
+
+    message += `\n⏰ *Thời gian:* ${new Date().toLocaleString("vi-VN")}`;
+
+    try {
+      // Gửi HTTP Request tới Telegram Bot API
+      const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: message,
+          parse_mode: "Markdown",
+        }),
+      });
+
+      if (response.ok) {
+        alert("Đặt hàng thành công! Đơn hàng đã được gửi tới hệ thống xử lý.");
+        
+        // Reset Form
+        setSelectedCategory(null);
+        setUsername("");
+        setPassword("");
+        setTwoFactor("");
+        setNote("");
+      } else {
+         console.error("Lỗi từ Telegram API:", await response.text());
+         alert("Có lỗi xảy ra khi gửi đơn hàng. Vui lòng thử lại sau!");
+      }
+
+    } catch (error) {
+      console.error("Lỗi khi gửi đơn hàng Telegram:", error);
+      alert("Có lỗi xảy ra khi kết nối. Vui lòng thử lại!");
+    }
   };
 
   return (
     <main className="min-h-screen bg-[#f0f6ff] text-slate-800 font-sans pb-16">
-      {/* THÔNG BÁO POPUP */}
       <NoticeModal />
-
-      {/* NHẠC NỀN */}
       <audio ref={audioRef} src="/nhacchill.mp3" loop preload="auto" />
 
       {/* HEADER NAVBAR */}
@@ -160,7 +204,6 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Nút bật/tắt Nhạc Chill */}
             <button
               onClick={toggleMusic}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm border ${
@@ -172,14 +215,12 @@ export default function Home() {
               <span>{isPlaying ? "🎵 Đang phát nhạc" : "🔇 Bật nhạc chill"}</span>
             </button>
 
-            {/* Khối Tài khoản & Đăng xuất */}
             <div className="bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold text-sky-700">
               <span className="w-6 h-6 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-bold">
                 👤
               </span>
               <span>{session ? session.user.email : "Khách - 0 đ"}</span>
 
-              {/* Nút Đăng xuất chỉ hiển thị khi đã đăng nhập */}
               {session && (
                 <button
                   onClick={handleLogout}
@@ -283,10 +324,8 @@ export default function Home() {
                 Dịch Vụ - {selectedCategory.title}
               </h3>
 
-              {/* CHỈ HIỆN FORM NÀY KHI CHỌN MỤC CÀY THUÊ */}
               {selectedCategory.id === "cay-thue" ? (
                 <div className="space-y-6">
-                  {/* BƯỚC 1: CHỌN GÓI DỊCH VỤ */}
                   <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
@@ -307,7 +346,6 @@ export default function Home() {
                     </select>
                   </div>
 
-                  {/* BƯỚC 2: THÔNG TIN TÀI KHOẢN */}
                   <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
                     <div className="flex items-center gap-2 mb-4">
                       <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
@@ -377,7 +415,6 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* BƯỚC 3: GHI CHÚ & XÁC NHẬN */}
                   <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
@@ -402,7 +439,6 @@ export default function Home() {
                   </div>
                 </div>
               ) : (
-                /* GIAO DIỆN CHỌN MUA ĐỐI VỚI CÁC MỤC KHÁC */
                 <div className="space-y-2 mb-6 max-h-[280px] overflow-y-auto pr-1">
                   {selectedCategory.items.map((item: any) => (
                     <div
@@ -423,7 +459,6 @@ export default function Home() {
                 </div>
               )}
 
-              {/* NÚT TẠO ĐƠN HÀNG */}
               <button
                 onClick={handleOrder}
                 className="w-full mt-6 py-3.5 bg-[#40c4ff] hover:bg-[#00b0ff] text-white font-black text-sm rounded-xl shadow-md transition-all uppercase tracking-wide"
