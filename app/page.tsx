@@ -150,26 +150,18 @@ export default function Home() {
 
   const handleLogout = async () => {
   try {
-    // 1. Đăng xuất khỏi Supabase
+    // 1. Đăng xuất tài khoản khỏi Supabase
     await supabase.auth.signOut();
-    
-    // 2. Reset toàn bộ State về mặc định
-    setSession(null);
-    setBalance(0);
-    
-    // 3. Xóa sạch LocalStorage/SessionStorage cached (nếu có)
+  } catch (error) {
+    console.error("Lỗi đăng xuất:", error);
+  } finally {
+    // 2. Xóa sạch dữ liệu lưu tạm ở trình duyệt
     if (typeof window !== "undefined") {
       localStorage.clear();
       sessionStorage.clear();
+      // 3. Tải lại trang chủ để đưa về trạng thái khách ban đầu
+      window.location.href = "/";
     }
-
-    alert("Đã đăng xuất thành công!");
-
-    // 4. Reload lại trang để làm sạch phiên làm việc
-    window.location.reload();
-  } catch (error) {
-    console.error("Lỗi đăng xuất:", error);
-    alert("Có lỗi xảy ra khi đăng xuất!");
   }
 };
 
@@ -297,9 +289,8 @@ export default function Home() {
       </div>
     </div>
 
-    {/* MENU NÚT BẤM VÀ TÀI KHOẢN */}
+    {/* TẤT CẢ CÁC NÚT BẤM HOẠT ĐỘNG CHUNG CÙNG NHAU */}
     <div className="flex flex-wrap items-center gap-2">
-      {/* NÚT LỊCH SỬ ĐẶT HÀNG */}
       <button
         type="button"
         onClick={() => openHistory("orders")}
@@ -308,7 +299,6 @@ export default function Home() {
         📋 Lịch Sử Đặt Hàng
       </button>
 
-      {/* NÚT LỊCH SỬ NẠP TIỀN */}
       <button
         type="button"
         onClick={() => openHistory("deposits")}
@@ -317,7 +307,6 @@ export default function Home() {
         💳 Lịch Sử Nạp Tiền
       </button>
 
-      {/* NÚT BẬT TẮT NHẠC */}
       <button
         type="button"
         onClick={toggleMusic}
@@ -330,27 +319,25 @@ export default function Home() {
         <span>{isPlaying ? "🎵 Đang phát" : "🔇 Bật nhạc"}</span>
       </button>
 
-      {/* THÔNG TIN USER */}
+      {/* THÔNG TIN TÀI KHOẢN */}
       <div className="bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold text-sky-700">
         <span className="w-5 h-5 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-bold text-[10px]">
           👤
         </span>
         <span>
-          {session?.user?.email ? session.user.email : "Khách"} -{" "}
+          {session?.user?.email || "Khách"} -{" "}
           <span className="text-emerald-600 font-extrabold">{balance.toLocaleString()} đ</span>
         </span>
       </div>
 
-      {/* NÚT ĐĂNG XUẤT */}
-      {session && (
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-xs font-black shadow-sm transition-all active:scale-95 cursor-pointer z-10"
-        >
-          Đăng xuất
-        </button>
-      )}
+      {/* NÚT ĐĂNG XUẤT (LUÔN HIỆN CHUNG VỚI CÁC NÚT KHÁC) */}
+      <button
+        type="button"
+        onClick={handleLogout}
+        className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-xs font-black shadow-sm transition-all active:scale-95 cursor-pointer"
+      >
+        Đăng xuất
+      </button>
     </div>
   </div>
 </header>
