@@ -48,7 +48,7 @@ const CATEGORIES = [
     title: "ACC BLOX FRUITS Random V4",
     badge: "Sẵn Sàng",
     badgeColor: "bg-sky-50 text-sky-600 border-sky-200",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSaXYiGiib_06_9V1aIqoHuGh-PokxmCDrCKJPWaDg&s=10",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM70JKMiGwF3sogwyhZ70TNqtWl1wdloQlq0t81bzMfQ&s",
     items: [
       { id: "acc-1", name: "Acc Max Level + Tộc V4 Ngẫu Nhiên", price: 150000 },
       { id: "acc-2", name: "Acc Max Level + Full Gear V4 Tự Chọn", price: 250000 },
