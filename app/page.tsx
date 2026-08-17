@@ -7,8 +7,8 @@ import NoticeModal from "./components/NoticeModal";
 // ========================================================
 // ⚠️ THAY THÔNG TIN TELEGRAM BOT CỦA BẠN VÀO 2 DÒNG DƯỚI ĐÂY
 // ========================================================
-const TELEGRAM_BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN";
-const TELEGRAM_CHAT_ID = "YOUR_TELEGRAM_CHAT_ID";
+const TELEGRAM_BOT_TOKEN = "8874478983:AAFWJMUFfE0Ymr_ByLmS40qs3VjSRqu2aa8";
+const TELEGRAM_CHAT_ID = "6966144660";
 
 // DỮ LIỆU CÁC MỤC DỊCH VỤ / TÀI KHOẢN
 const CATEGORIES = [
