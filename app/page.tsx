@@ -279,55 +279,27 @@ export default function Home() {
       </div>
     </div>
 
-    {/* MENU NÚT BẤM */}
-    <div className="flex flex-wrap items-center gap-2">
-      <button
-        onClick={() => openHistory("orders")}
-        className="px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all border border-slate-200"
-      >
-        📋 Lịch Sử Đặt Hàng
-      </button>
+    {/* KHU VỰC HIỂN THỊ LUÔN NÚT ĐĂNG XUẤT ĐỂ KIỂM TRA */}
+<div className="flex items-center gap-2">
+  <div className="bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold text-sky-700">
+    <span className="w-5 h-5 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-bold text-[10px]">
+      👤
+    </span>
+    <span>
+      {session?.user?.email || "Khách"} -{" "}
+      <span className="text-emerald-600 font-extrabold">{balance.toLocaleString()} đ</span>
+    </span>
+  </div>
 
-      <button
-        onClick={() => openHistory("deposits")}
-        className="px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all border border-slate-200"
-      >
-        💳 Lịch Sử Nạp Tiền
-      </button>
-
-      <button
-        onClick={toggleMusic}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm border ${
-          isPlaying
-            ? "bg-emerald-50 text-emerald-600 border-emerald-200 animate-pulse"
-            : "bg-slate-100 text-slate-600 border-slate-200"
-        }`}
-      >
-        <span>{isPlaying ? "🎵 Đang phát" : "🔇 Bật nhạc"}</span>
-      </button>
-
-      {/* HIỂN THỊ THÔNG TIN USER */}
-      <div className="bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold text-sky-700">
-        <span className="w-5 h-5 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-bold text-[10px]">
-          👤
-        </span>
-        <span>
-          {session?.user?.email ? session.user.email : "Khách"} -{" "}
-          <span className="text-emerald-600 font-extrabold">{balance.toLocaleString()} đ</span>
-        </span>
-      </div>
-
-      {/* NÚT ĐĂNG XUẤT HIỂN THỊ KHI CÓ USER */}
-      {session && (
-        <button
-          onClick={handleLogout}
-          type="button"
-          className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-xs font-black shadow-sm transition-all active:scale-95 cursor-pointer z-10"
-        >
-          Đăng xuất
-        </button>
-      )}
-    </div>
+  {/* NÚT ĐĂNG XUẤT CỐ ĐỊNH (LUÔN HIỆN) */}
+  <button
+    onClick={handleLogout}
+    type="button"
+    className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-xs font-black shadow-sm transition-all active:scale-95 cursor-pointer"
+  >
+    Đăng xuất
+  </button>
+</div>
   </div>
 </header>
 
