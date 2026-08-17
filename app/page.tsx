@@ -10,7 +10,6 @@ import NoticeModal from "./components/NoticeModal";
 const TELEGRAM_BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN";
 const TELEGRAM_CHAT_ID = "YOUR_TELEGRAM_CHAT_ID";
 
-// DỮ LIỆU CÁC MỤC DỊCH VỤ / TÀI KHOẢN
 const CATEGORIES = [
   {
     id: "cay-thue",
@@ -90,7 +89,12 @@ export default function Home() {
   const [selectedItemId, setSelectedItemId] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // State cho Form Cày Thuê
+  // State Quản Lý Lịch Sử Modal
+  const [historyTab, setHistoryTab] = useState<"orders" | "deposits" | null>(null);
+  const [ordersHistory, setOrdersHistory] = useState<any[]>([]);
+  const [depositsHistory, setDepositsHistory] = useState<any[]>([]);
+
+  // State Form Cày Thuê
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [twoFactor, setTwoFactor] = useState("");
@@ -128,12 +132,24 @@ export default function Home() {
     alert("Đã đăng xuất thành công!");
   };
 
-  // KIỂM TRA XEM HẠNG MỤC CÓ CẦN NHẬP TÀI KHOẢN HAY KHÔNG (DỊCH VỤ CÀY THUÊ)
   const isServiceCategory = (catId: string) => {
     return ["cay-thue", "combo-draco", "race-v4"].includes(catId);
   };
 
-  // HÀM XỬ LÝ ĐẶT HÀNG VÀ GỬI THÔNG BÁO VỀ TELEGRAM BOT
+  const openHistory = (tab: "orders" | "deposits") => {
+    setHistoryTab(tab);
+    if (tab === "orders") {
+      // Dữ liệu mẫu (hoặc fetch từ Supabase)
+      setOrdersHistory([
+        { id: "ORD-01", service: "Level 1500 - MAX", price: 30000, status: "Đang xử lý", date: "17/08/2026" },
+      ]);
+    } else {
+      setDepositsHistory([
+        { id: "DEP-01", amount: 50000, method: "Chuyển khoản / Thẻ nạp", status: "Thành công", date: "16/08/2026" },
+      ]);
+    }
+  };
+
   const handleOrder = async () => {
     if (isSubmitting) return;
 
@@ -151,14 +167,12 @@ export default function Home() {
 
     setIsSubmitting(true);
 
-    // Soạn nội dung thông báo Telegram
     let message = `🛒 *ĐƠN HÀNG MỚI TỪ WEBSITE*\n\n`;
     message += `📌 *Danh mục:* ${selectedCategory.title}\n`;
     message += `📦 *Gói dịch vụ:* ${item.name}\n`;
     message += `💰 *Giá tiền:* ${item.price.toLocaleString()} VNĐ\n`;
     message += `👤 *Khách hàng (Email):* ${session?.user?.email || "Khách vãng lai"}\n`;
 
-    // Luôn đính kèm thông tin tài khoản nếu là gói cày thuê / combo
     if (requireAccount || username || password) {
       message += `\n🔑 *THÔNG TIN TÀI KHOẢN:* \n`;
       message += `• *Tài khoản:* \`${username}\`\n`;
@@ -182,19 +196,15 @@ export default function Home() {
 
       if (response.ok) {
         alert("Đặt hàng thành công! Đơn hàng đã được gửi tới hệ thống xử lý.");
-        
-        // Reset Form
         setSelectedCategory(null);
         setUsername("");
         setPassword("");
         setTwoFactor("");
         setNote("");
       } else {
-        console.error("Lỗi từ Telegram API:", await response.text());
         alert("Có lỗi xảy ra khi gửi đơn hàng. Vui lòng kiểm tra lại Token & Chat ID!");
       }
     } catch (error) {
-      console.error("Lỗi khi gửi đơn hàng Telegram:", error);
       alert("Có lỗi xảy ra khi kết nối. Vui lòng thử lại!");
     } finally {
       setIsSubmitting(false);
@@ -217,6 +227,20 @@ export default function Home() {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <button
+              onClick={() => openHistory("orders")}
+              className="px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all border border-slate-200"
+            >
+              📋 Lịch Sử Đặt Hàng
+            </button>
+
+            <button
+              onClick={() => openHistory("deposits")}
+              className="px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all border border-slate-200"
+            >
+              💳 Lịch Sử Nạp Tiền
+            </button>
+
+            <button
               onClick={toggleMusic}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm border ${
                 isPlaying
@@ -224,7 +248,7 @@ export default function Home() {
                   : "bg-slate-100 text-slate-600 border-slate-200"
               }`}
             >
-              <span>{isPlaying ? "🎵 Đang phát nhạc" : "🔇 Bật nhạc chill"}</span>
+              <span>{isPlaying ? "🎵 Đang phát" : "🔇 Bật nhạc"}</span>
             </button>
 
             <div className="bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold text-sky-700">
@@ -237,7 +261,6 @@ export default function Home() {
                 <button
                   onClick={handleLogout}
                   className="ml-1 px-2 py-0.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-[10px] font-extrabold transition-all shadow-sm"
-                  title="Đăng xuất"
                 >
                   Đăng xuất
                 </button>
@@ -260,16 +283,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 border border-sky-100 shadow-sm mt-6 text-xs text-slate-600 leading-relaxed">
-          <p className="font-bold text-slate-800 mb-1">
-            100% Tài khoản ROBLOX đều là account Global (Quốc Tế)
-          </p>
-          <div className="flex flex-wrap gap-2 text-[11px] font-semibold text-sky-600">
-            <span>ACC BLOXFRUIT VIP</span> • <span>ACC BLOXFRUIT V4 Random</span> • <span>CÀY THUÊ</span> • 
-          </div>
-        </div>
-
-        {/* MỤC SẢN PHẨM / TÀI KHOẢN */}
+        {/* CỬA HÀNG DỊCH VỤ */}
         <div className="mt-8">
           <div className="flex items-center justify-center mb-6">
             <span className="bg-white text-sky-600 border border-sky-200 font-black text-sm px-6 py-2 rounded-full shadow-sm">
@@ -290,11 +304,6 @@ export default function Home() {
                       alt={cat.title}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                      <span className="bg-sky-400/90 text-white text-[11px] font-bold px-3 py-1 rounded-full backdrop-blur">
-                        XEM
-                      </span>
-                    </div>
                   </div>
 
                   <div className="text-center px-2">
@@ -321,7 +330,65 @@ export default function Home() {
           </div>
         </div>
 
-        {/* MODAL GIAO DIỆN ĐẶT HÀNG / CÀY THUÊ */}
+        {/* MODAL LỊCH SỬ NẠP TIỀN / LỊCH SỬ ĐẶT HÀNG */}
+        {historyTab && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-sky-100 relative">
+              <button
+                onClick={() => setHistoryTab(null)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center hover:bg-slate-200"
+              >
+                ✕
+              </button>
+
+              <h3 className="text-lg font-black text-sky-600 mb-4 uppercase">
+                {historyTab === "orders" ? "📋 Lịch Sử Đặt Hàng" : "💳 Lịch Sử Nạp Tiền"}
+              </h3>
+
+              <div className="space-y-3 max-h-[350px] overflow-y-auto">
+                {historyTab === "orders" ? (
+                  ordersHistory.length > 0 ? (
+                    ordersHistory.map((item) => (
+                      <div key={item.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs flex justify-between items-center">
+                        <div>
+                          <p className="font-bold text-slate-800">{item.service}</p>
+                          <p className="text-slate-400 text-[11px]">{item.date} • {item.id}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-sky-600">{item.price.toLocaleString()} VNĐ</p>
+                          <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold">
+                            {item.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-slate-400 text-center py-6">Chưa có lịch sử đặt hàng nào.</p>
+                  )
+                ) : depositsHistory.length > 0 ? (
+                  depositsHistory.map((item) => (
+                    <div key={item.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs flex justify-between items-center">
+                      <div>
+                        <p className="font-bold text-slate-800">{item.method}</p>
+                        <p className="text-slate-400 text-[11px]">{item.date} • {item.id}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-emerald-600">+{item.amount.toLocaleString()} VNĐ</p>
+                        <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold">
+                          {item.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-400 text-center py-6">Chưa có lịch sử nạp tiền nào.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL ĐẶT HÀNG */}
         {selectedCategory && (
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
             <div className="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-sky-100 relative max-h-[90vh] overflow-y-auto my-auto">
@@ -337,7 +404,6 @@ export default function Home() {
               </h3>
 
               <div className="space-y-6">
-                {/* 1. CHỌN GÓI DỊCH VỤ */}
                 <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
@@ -358,7 +424,6 @@ export default function Home() {
                   </select>
                 </div>
 
-                {/* 2. NHẬP THÔNG TIN TÀI KHOẢN (ÁP DỤNG CHO TẤT CẢ GÓI CÀY THUÊ & COMBO) */}
                 {isServiceCategory(selectedCategory.id) && (
                   <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
                     <div className="flex items-center gap-2 mb-4">
@@ -371,32 +436,24 @@ export default function Home() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs font-bold text-slate-700 mb-1">Tài Khoản</label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-2.5 text-slate-400 text-sm">👤</span>
-                          <input
-                            type="text"
-                            placeholder="Nhập tài khoản cần cày"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            autoComplete="off"
-                            data-lpignore="true"
-                            className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400"
-                          />
-                        </div>
+                        <input
+                          type="text"
+                          placeholder="Nhập tài khoản cần cày"
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value)}
+                          className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400"
+                        />
                       </div>
 
                       <div>
                         <label className="block text-xs font-bold text-slate-700 mb-1">Mật Khẩu</label>
                         <div className="relative">
-                          <span className="absolute left-3 top-2.5 text-slate-400 text-sm">🔒</span>
                           <input
                             type={showPassword ? "text" : "password"}
-                            placeholder="Nhập mật khẩu của tài khoản đó"
+                            placeholder="Nhập mật khẩu"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            autoComplete="new-password"
-                            data-lpignore="true"
-                            className="w-full pl-9 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400"
+                            className="w-full pl-3 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400"
                           />
                           <button
                             type="button"
@@ -408,51 +465,8 @@ export default function Home() {
                         </div>
                       </div>
                     </div>
-
-                    <div className="mt-4">
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Cookie / 2FA</label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-2.5 text-slate-400 text-sm">🔑</span>
-                        <input
-                          type="text"
-                          placeholder="Có thể nhập chuỗi 2FA, link game pass hoặc cookie liên quan"
-                          value={twoFactor}
-                          onChange={(e) => setTwoFactor(e.target.value)}
-                          autoComplete="off"
-                          data-lpignore="true"
-                          className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400"
-                        />
-                      </div>
-                      <p className="text-[11px] text-slate-400 mt-1">
-                        ℹ️ Dữ liệu này không bắt buộc, có thể bỏ trống
-                      </p>
-                    </div>
                   </div>
                 )}
-
-                {/* 3. GHI CHÚ KHÁCH HÀNG */}
-                <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
-                      {isServiceCategory(selectedCategory.id) ? "3" : "2"}
-                    </span>
-                    <h4 className="font-bold text-slate-800 text-sm">Ghi Chú & Xác Nhận</h4>
-                  </div>
-
-                  <div className="relative">
-                    <textarea
-                      rows={3}
-                      maxLength={500}
-                      placeholder="Nhập ghi chú cho admin nếu có..."
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
-                      className="w-full p-3 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400 resize-none"
-                    />
-                    <span className="absolute right-3 bottom-2 text-[10px] text-slate-400">
-                      {note.length} / 500
-                    </span>
-                  </div>
-                </div>
               </div>
 
               <button
