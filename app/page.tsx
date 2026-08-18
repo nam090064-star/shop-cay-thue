@@ -69,7 +69,7 @@ export default function Dashboard() {
     }
   };
 
-  // 2. Lắng nghe trạng thái Auth
+  // 2. Lắng nghe trạng thái Auth (Đã fix đầy đủ type cho TypeScript)
   useEffect(() => {
     const {
       data: { subscription },
@@ -92,7 +92,7 @@ export default function Dashboard() {
     };
   }, [supabase]);
 
-  // 3. Xử lý Mua hàng an toàn
+  // 3. Xử lý Mua hàng an toàn (Thông qua Supabase RPC)
   const handleOrder = async (item: ServiceItem) => {
     if (!session || !user) {
       alert("Vui lòng đăng nhập để thực hiện giao dịch.");
@@ -129,7 +129,7 @@ export default function Dashboard() {
     }
   };
 
-  // 4. Lấy lịch sử giao dịch
+  // 4. Lấy lịch sử giao dịch thực tế
   const fetchHistory = async (tab: "orders" | "deposits") => {
     if (!user) return;
     setLoadingHistory(true);
