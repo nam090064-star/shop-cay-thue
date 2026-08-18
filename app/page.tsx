@@ -144,18 +144,21 @@ export default function Home() {
 
   const handleLogout = async () => {
   try {
-    // 1. Gọi lệnh đăng xuất từ Supabase
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    // 1. Đăng xuất khỏi Supabase
+    await supabase.auth.signOut();
 
-    // 2. Thông báo cho người dùng
+    // 2. Xóa các dữ liệu lưu đệm ở client (nếu có)
+    localStorage.clear();
+    sessionStorage.clear();
+
+    // 3. Thông báo cho người dùng
     alert("Đăng xuất thành công!");
 
-    // 3. Xóa sạch bộ nhớ tạm và chuyển về trang chủ
+    // 4. Chuyển hướng cứng về trang chủ để render lại giao diện mới
     window.location.href = "/";
   } catch (error) {
     console.error("Lỗi đăng xuất:", error);
-    alert("Có lỗi xảy ra khi đăng xuất. Vui lòng thử lại!");
+    alert("Có lỗi xảy ra khi đăng xuất!");
   }
 };
 
