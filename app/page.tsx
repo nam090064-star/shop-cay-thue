@@ -143,18 +143,23 @@ export default function Home() {
   };
 
   const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error("Lỗi đăng xuất:", error);
-    } finally {
-      if (typeof window !== "undefined") {
-        localStorage.clear();
-        sessionStorage.clear();
-        window.location.href = "/";
-      }
-    }
-  };
+  try {
+    // 1. Đăng xuất khỏi Supabase Session
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+
+    // 2. Reset các state cần thiết
+    setSession(null);
+    setBalance(0);
+
+    // 3. Thông báo và tải lại trang
+    alert("Đã đăng xuất thành công!");
+    window.location.reload();
+  } catch (error: any) {
+    console.error("Lỗi đăng xuất:", error.message);
+    alert("Có lỗi xảy ra khi đăng xuất!");
+  }
+};
 
   const isServiceCategory = (catId: string) => {
     return ["cay-thue", "combo-draco", "race-v4"].includes(catId);
