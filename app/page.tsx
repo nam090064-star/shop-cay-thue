@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { createBrowserClient } from "@supabase/ssr";
-import { User, Session } from "@supabase/supabase-js";
+import { supabase } from "./lib/supabase";
 import NoticeModal from "./components/NoticeModal";
 
 const CATEGORIES = [
@@ -78,18 +77,19 @@ const CATEGORIES = [
 ];
 
 export default function Home() {
-  // Khởi tạo Supabase Client với @supabase/ssr
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<any>(null);
   const [balance, setBalance] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [selectedItemId, setSelectedItemId] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  // State Auth Modal (Đăng nhập / Đăng ký)
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+  const [authMode, setAuthMode] = useState<"login" | "register">("login");
+  const [authEmail, setAuthEmail] = useState<string>("");
+  const [authPassword, setAuthPassword] = useState<string>("");
+  const [authLoading, setAuthLoading] = useState<boolean>(false);
 
   // State Quản Lý Lịch Sử Modal
   const [historyTab, setHistoryTab] = useState<"orders" | "deposits" | null>(null);
@@ -137,7 +137,7 @@ export default function Home() {
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase]);
+  }, []);
 
   const toggleMusic = () => {
     if (!audioRef.current) return;
@@ -149,29 +149,46 @@ export default function Home() {
     }
   };
 
+  // HÀM ĐĂNG XUẤT TỐI GIẢN
   const handleLogout = async () => {
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  };
+
+  // HÀM XỬ LÝ ĐĂNG NHẬP / ĐĂNG KÝ
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!authEmail || !authPassword) {
+      alert("Vui lòng điền đầy đủ Email và Mật khẩu!");
+      return;
+    }
+
+    setAuthLoading(true);
+
     try {
-      // 1. Gọi đăng xuất từ Supabase
-      await supabase.auth.signOut();
+      if (authMode === "login") {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: authEmail,
+          password: authPassword,
+        });
+        if (error) throw error;
+        alert("Đăng nhập thành công!");
+      } else {
+        const { error } = await supabase.auth.signUp({
+          email: authEmail,
+          password: authPassword,
+        });
+        if (error) throw error;
+        alert("Đăng ký thành công! Hãy đăng nhập để trải nghiệm.");
+      }
 
-      // 2. Xóa sạch LocalStorage & SessionStorage
-      localStorage.clear();
-      sessionStorage.clear();
-
-      // 3. Xóa Cookie của Supabase (nếu có)
-      document.cookie.split(";").forEach((c) => {
-        document.cookie = c
-          .replace(/^ +/, "")
-          .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-      });
-
-      alert("Đăng xuất thành công!");
-
-      // 4. Chuyển hướng về trang chủ
-      window.location.href = "/";
-    } catch (error) {
-      console.error("Lỗi đăng xuất:", error);
-      alert("Có lỗi xảy ra khi đăng xuất!");
+      setShowAuthModal(false);
+      setAuthEmail("");
+      setAuthPassword("");
+    } catch (error: any) {
+      alert(error.message || "Thao tác thất bại, vui lòng thử lại!");
+    } finally {
+      setAuthLoading(false);
     }
   };
 
@@ -180,6 +197,10 @@ export default function Home() {
   };
 
   const openHistory = (tab: "orders" | "deposits") => {
+    if (!session?.user) {
+      setShowAuthModal(true);
+      return;
+    }
     setHistoryTab(tab);
     if (tab === "orders") {
       setOrdersHistory([
@@ -197,7 +218,7 @@ export default function Home() {
     if (isSubmitting) return;
 
     if (!session?.user) {
-      alert("Vui lòng đăng nhập tài khoản trước khi đặt hàng!");
+      setShowAuthModal(true);
       return;
     }
 
@@ -316,25 +337,36 @@ export default function Home() {
               <span>{isPlaying ? "🎵 Đang phát" : "🔇 Bật nhạc"}</span>
             </button>
 
-            {/* THÔNG TIN TÀI KHOẢN */}
-            <div className="bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold text-sky-700">
-              <span className="w-5 h-5 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-bold text-[10px]">
-                👤
-              </span>
-              <span>
-                {session?.user?.email || "Khách"} -{" "}
-                <span className="text-emerald-600 font-extrabold">{balance.toLocaleString()} đ</span>
-              </span>
-            </div>
+            {/* THÔNG TIN TÀI KHOẢN / ĐĂNG NHẬP */}
+            {session?.user ? (
+              <>
+                <div className="bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold text-sky-700">
+                  <span className="w-5 h-5 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-bold text-[10px]">
+                    👤
+                  </span>
+                  <span>
+                    {session.user.email} -{" "}
+                    <span className="text-emerald-600 font-extrabold">{balance.toLocaleString()} đ</span>
+                  </span>
+                </div>
 
-            {/* NÚT ĐĂNG XUẤT */}
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-xs font-black shadow-sm transition-all active:scale-95 cursor-pointer"
-            >
-              Đăng xuất
-            </button>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-xs font-black shadow-sm transition-all active:scale-95 cursor-pointer"
+                >
+                  Đăng xuất
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowAuthModal(true)}
+                className="px-4 py-1.5 bg-sky-500 hover:bg-sky-600 text-white rounded-full text-xs font-black shadow-sm transition-all active:scale-95 cursor-pointer"
+              >
+                Đăng Nhập / Đăng Ký
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -399,6 +431,84 @@ export default function Home() {
             ))}
           </div>
         </div>
+
+        {/* MODAL ĐĂNG NHẬP / ĐĂNG KÝ */}
+        {showAuthModal && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-sky-100 relative">
+              <button
+                type="button"
+                onClick={() => setShowAuthModal(false)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center hover:bg-slate-200 cursor-pointer"
+              >
+                ✕
+              </button>
+
+              <div className="flex border-b border-slate-200 mb-6">
+                <button
+                  type="button"
+                  onClick={() => setAuthMode("login")}
+                  className={`flex-1 py-3 font-extrabold text-sm border-b-2 text-center cursor-pointer ${
+                    authMode === "login"
+                      ? "border-sky-500 text-sky-600"
+                      : "border-transparent text-slate-400 hover:text-slate-600"
+                  }`}
+                >
+                  ĐĂNG NHẬP
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAuthMode("register")}
+                  className={`flex-1 py-3 font-extrabold text-sm border-b-2 text-center cursor-pointer ${
+                    authMode === "register"
+                      ? "border-sky-500 text-sky-600"
+                      : "border-transparent text-slate-400 hover:text-slate-600"
+                  }`}
+                >
+                  ĐĂNG KÝ
+                </button>
+              </div>
+
+              <form onSubmit={handleAuthSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Email</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="Nhập địa chỉ Email"
+                    value={authEmail}
+                    onChange={(e) => setAuthEmail(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Mật khẩu</label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Nhập mật khẩu"
+                    value={authPassword}
+                    onChange={(e) => setAuthPassword(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={authLoading}
+                  className="w-full py-3 bg-sky-500 hover:bg-sky-600 text-white font-black text-xs rounded-xl shadow-md transition-all uppercase cursor-pointer"
+                >
+                  {authLoading
+                    ? "ĐANG XỬ LÝ..."
+                    : authMode === "login"
+                    ? "ĐĂNG NHẬP"
+                    : "TẠO TÀI KHOẢN"}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
 
         {/* MODAL LỊCH SỬ */}
         {historyTab && (
