@@ -8,11 +8,12 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function HistoryModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export default function OrderHistoryModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showPassId, setShowPassId] = useState<number | null>(null);
+  const [copiedId, setCopiedId] = useState<number | null>(null);
 
-  // Lấy dữ liệu thật từ Supabase mỗi khi mở Modal Lịch sử
   useEffect(() => {
     if (isOpen) {
       fetchOrders();
@@ -24,7 +25,7 @@ export default function HistoryModal({ isOpen, onClose }: { isOpen: boolean; onC
     const { data, error } = await supabase
       .from('orders')
       .select('*')
-      .order('created_at', { ascending: false }); // Đơn mới nhất xếp lên đầu
+      .order('created_at', { ascending: false });
 
     if (!error && data) {
       setOrders(data);
@@ -32,12 +33,17 @@ export default function HistoryModal({ isOpen, onClose }: { isOpen: boolean; onC
     setLoading(false);
   };
 
+  const handleCopy = (text: string, id: number) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-lg w-full p-6 relative shadow-xl">
-        {/* Nút đóng Modal */}
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-3xl max-w-lg w-full p-6 relative shadow-2xl">
         <button 
           onClick={onClose} 
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 font-bold"
@@ -45,39 +51,62 @@ export default function HistoryModal({ isOpen, onClose }: { isOpen: boolean; onC
           ✕
         </button>
 
-        <h2 className="text-xl font-bold text-center mb-4 text-blue-600 flex items-center justify-center gap-2">
+        <h2 className="text-xl font-extrabold text-center mb-4 text-gray-800">
           📜 LỊCH SỬ ĐẶT HÀNG
         </h2>
 
         {loading ? (
-          <p className="text-center py-6 text-gray-500">Đang tải lịch sử...</p>
+          <p className="text-center py-8 text-gray-400">Đang tải lịch sử...</p>
         ) : orders.length === 0 ? (
-          <p className="text-center py-6 text-gray-500">Bạn chưa có đơn hàng nào.</p>
+          <p className="text-center py-8 text-gray-400">Chưa có đơn hàng nào.</p>
         ) : (
           <div className="max-h-80 overflow-y-auto space-y-3 pr-1">
             {orders.map((item) => (
-              <div key={item.id} className="bg-gray-50 border border-gray-200 p-3 rounded-xl">
+              <div key={item.id} className="bg-gray-50 border border-gray-200 p-3.5 rounded-2xl">
                 <div className="flex justify-between items-start mb-1">
-                  <span className="font-bold text-gray-800">{item.service}</span>
-                  <span className="text-blue-600 font-bold">{item.amount} VNĐ</span>
+                  <span className="font-bold text-gray-800 text-sm">{item.service}</span>
+                  <span className="text-blue-600 font-extrabold text-sm">{item.amount} VNĐ</span>
                 </div>
 
-                <div className="text-xs text-gray-500 mb-2">
-                  {new Date(item.created_at).toLocaleString('vi-VN')} • {item.order_id}
+                <div className="text-[11px] text-gray-400 mb-2 flex justify-between">
+                  <span>Mã: <code className="text-gray-600">{item.order_id}</code></span>
+                  <span>{new Date(item.created_at).toLocaleString('vi-VN')}</span>
                 </div>
 
-                {/* HIỂN THỊ THÔNG TIN TÀI KHOẢN | MẬT KHẨU GIAO CHO KHÁCH */}
-                <div className="bg-gray-900 text-green-400 p-2 rounded text-xs font-mono flex justify-between items-center">
-                  <span>TK|MK: <strong>{item.account_info || 'Đang xử lý'}</strong></span>
-                  {item.account_info && (
-                    <button 
-                      onClick={() => navigator.clipboard.writeText(item.account_info)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[10px]"
-                    >
-                      Copy
-                    </button>
-                  )}
-                </div>
+                {/* TỰ ĐỘNG NHẬN BIẾT: ĐƠN MUA ACC HOẶC ĐƠN CÀY THUÊ */}
+                {item.account_info ? (
+                  /* Đơn Mua Acc -> Hiện ô Bảo Mật Acc | Pass */
+                  <div className="bg-slate-900 text-slate-100 p-2.5 rounded-xl text-xs font-mono flex items-center justify-between mt-2">
+                    <div className="truncate mr-2">
+                      <span className="text-slate-400">Acc: </span>
+                      <span className="text-emerald-400 font-semibold">
+                        {showPassId === item.id ? item.account_info : '••••••••••••••••••••'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        onClick={() => setShowPassId(showPassId === item.id ? null : item.id)}
+                        className="p-1 text-slate-400 hover:text-white"
+                      >
+                        {showPassId === item.id ? '👁️' : '🙈'}
+                      </button>
+                      <button
+                        onClick={() => handleCopy(item.account_info, item.id)}
+                        className="bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-sans font-bold"
+                      >
+                        {copiedId === item.id ? '✓ Đã Copy' : 'Copy'}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  /* Đơn Cày Thuê -> Hiện trạng thái xử lý */
+                  <div className="flex justify-between items-center text-xs pt-1 border-t border-gray-200 mt-2">
+                    <span className="text-gray-500">Trạng thái:</span>
+                    <span className="bg-amber-100 text-amber-700 font-bold px-2 py-0.5 rounded-full text-[10px]">
+                      {item.status || 'Đang xử lý'}
+                    </span>
+                  </div>
+                )}
               </div>
             ))}
           </div>
