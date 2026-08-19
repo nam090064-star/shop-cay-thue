@@ -77,6 +77,7 @@ const CATEGORIES = [
 ];
 
 export default function Home() {
+  const [isNoticeOpen, setIsNoticeOpen] = useState(false);
   const [session, setSession] = useState<any>(null);
   const [balance, setBalance] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -294,7 +295,10 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#f0f6ff] text-slate-800 font-sans pb-16">
-      <NoticeModal />
+      <NoticeModal 
+  isOpen={isNoticeOpen} 
+  onClose={() => setIsNoticeOpen(false)} 
+/>
       <audio ref={audioRef} src="/nhacchill.mp3" loop preload="auto" />
 
       {/* HEADER NAVBAR */}
