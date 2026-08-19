@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   try {
     const { customer_name, service, amount } = await request.json();
 
-    // 1. TÌM 1 ACC CHƯA BÁN KHỚP VỚI GÓI DỊCH VỤ TRONG KHO
+    // 1. TÌM 1 ACC CHƯA BÁN TRONG BẢNG ACCOUNTS
     const { data: acc } = await supabase
       .from('accounts')
       .select('*')
@@ -26,14 +26,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. ĐÁNH DẤU ACC ĐÓ ĐÃ BÁN (status = 'sold')
+    // 2. ĐÁNH DẤU ACC ĐÓ ĐÃ BÁN TRONG BẢNG ACCOUNTS
     await supabase
       .from('accounts')
       .update({ status: 'sold' })
       .eq('id', acc.id);
 
-    // 3. LƯU ĐƠN HÀNG VÀO LỊCH SỬ (BẢNG ORDERS)
-    const orderId = 'ORD' + Date.now();
+    // 3. TẠO MÃ ĐƠN HÀNG VÀ LƯU VÀO BẢNG ORDERS (LỊCH SỬ)
+    const orderId = 'ORD' + Date.now(); // Tạo mã orderId trước khi dùng
 
     const { data: newOrder, error } = await supabase
       .from('orders')
@@ -43,19 +43,22 @@ export async function POST(request: Request) {
           customer_name: customer_name,
           service: service,
           amount: amount,
-          account_info: acc.account_info, // Lưu tài khoản | mật khẩu vào lịch sử
+          account_info: acc.account_info, // Lưu thông tin Acc vừa lấy được
         },
       ])
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Lỗi khi insert order:', error);
+      throw error;
+    }
 
-    // 4. TRẢ VỀ THÔNG BÁO CHO KHÁCH HÀNG
+    // 4. TRẢ VỀ KẾT QUẢ CHO FRONTEND
     return NextResponse.json({
       success: true,
       message: 'Mua hàng thành công!',
-      account_info: acc.account_info,
+      data: newOrder,
     });
 
   } catch (error: any) {
