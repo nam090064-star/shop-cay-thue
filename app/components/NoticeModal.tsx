@@ -1,59 +1,87 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { supabase } from "../lib/supabase";
+import { useEffect, useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
 
-export default function NoticeModal() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [notice, setNotice] = useState<any>(null);
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
+export default function HistoryModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Lấy dữ liệu thật từ Supabase mỗi khi mở Modal Lịch sử
   useEffect(() => {
-    const fetchNotice = async () => {
-      const { data, error } = await supabase
-        .from("notices")
-        .select("*")
-        .eq("is_active", true)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .single();
+    if (isOpen) {
+      fetchOrders();
+    }
+  }, [isOpen]);
 
-      if (data && !error) {
-        setNotice(data);
-        setIsOpen(true);
-      }
-    };
+  const fetchOrders = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: false }); // Đơn mới nhất xếp lên đầu
 
-    fetchNotice();
-  }, []);
+    if (!error && data) {
+      setOrders(data);
+    }
+    setLoading(false);
+  };
 
-  if (!isOpen || !notice) return null;
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] z-[100] flex items-center justify-center p-4">
-      {/* KHUNG POPUP BO GÓC GIỐNG ẢNH */}
-      <div className="bg-[#f8faff] rounded-[28px] max-w-sm w-full p-6 shadow-xl border border-sky-100/80 text-center relative animate-fadeIn">
-        
-        {/* TIÊU ĐỀ KÈM 2 CHUÔNG XANH */}
-        <div className="flex items-center justify-center gap-2 mb-3">
-          <span className="text-sky-400 text-lg">🔔</span>
-          <h3 className="text-base font-bold text-[#1e293b]">
-            {notice.title || "Thông Báo Mới"}
-          </h3>
-          <span className="text-sky-400 text-lg">🔔</span>
-        </div>
-
-        {/* NỘI DUNG THÔNG BÁO CĂN GIỮA */}
-        <p className="text-xs text-slate-600 leading-relaxed mb-6 font-medium px-2 whitespace-pre-wrap">
-          {notice.content}
-        </p>
-
-        {/* NÚT OK NỔI BẬT */}
-        <button
-          onClick={() => setIsOpen(false)}
-          className="px-8 py-2 bg-[#38bdf8] hover:bg-[#0284c7] active:scale-95 text-white font-black text-xs rounded-full border-2 border-sky-200 shadow-[0_0_12px_rgba(56,189,248,0.4)] transition-all uppercase tracking-wider"
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl max-w-lg w-full p-6 relative shadow-xl">
+        {/* Nút đóng Modal */}
+        <button 
+          onClick={onClose} 
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 font-bold"
         >
-          OK
+          ✕
         </button>
+
+        <h2 className="text-xl font-bold text-center mb-4 text-blue-600 flex items-center justify-center gap-2">
+          📜 LỊCH SỬ ĐẶT HÀNG
+        </h2>
+
+        {loading ? (
+          <p className="text-center py-6 text-gray-500">Đang tải lịch sử...</p>
+        ) : orders.length === 0 ? (
+          <p className="text-center py-6 text-gray-500">Bạn chưa có đơn hàng nào.</p>
+        ) : (
+          <div className="max-h-80 overflow-y-auto space-y-3 pr-1">
+            {orders.map((item) => (
+              <div key={item.id} className="bg-gray-50 border border-gray-200 p-3 rounded-xl">
+                <div className="flex justify-between items-start mb-1">
+                  <span className="font-bold text-gray-800">{item.service}</span>
+                  <span className="text-blue-600 font-bold">{item.amount} VNĐ</span>
+                </div>
+
+                <div className="text-xs text-gray-500 mb-2">
+                  {new Date(item.created_at).toLocaleString('vi-VN')} • {item.order_id}
+                </div>
+
+                {/* HIỂN THỊ THÔNG TIN TÀI KHOẢN | MẬT KHẨU GIAO CHO KHÁCH */}
+                <div className="bg-gray-900 text-green-400 p-2 rounded text-xs font-mono flex justify-between items-center">
+                  <span>TK|MK: <strong>{item.account_info || 'Đang xử lý'}</strong></span>
+                  {item.account_info && (
+                    <button 
+                      onClick={() => navigator.clipboard.writeText(item.account_info)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[10px]"
+                    >
+                      Copy
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
