@@ -8,7 +8,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function OrderHistoryModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export default function NoticeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [showPassId, setShowPassId] = useState<number | null>(null);
@@ -46,7 +46,7 @@ export default function OrderHistoryModal({ isOpen, onClose }: { isOpen: boolean
       <div className="bg-white rounded-3xl max-w-lg w-full p-6 relative shadow-2xl">
         <button 
           onClick={onClose} 
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 font-bold"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 font-bold text-lg"
         >
           ✕
         </button>
@@ -73,9 +73,7 @@ export default function OrderHistoryModal({ isOpen, onClose }: { isOpen: boolean
                   <span>{new Date(item.created_at).toLocaleString('vi-VN')}</span>
                 </div>
 
-                {/* TỰ ĐỘNG NHẬN BIẾT: ĐƠN MUA ACC HOẶC ĐƠN CÀY THUÊ */}
                 {item.account_info ? (
-                  /* Đơn Mua Acc -> Hiện ô Bảo Mật Acc | Pass */
                   <div className="bg-slate-900 text-slate-100 p-2.5 rounded-xl text-xs font-mono flex items-center justify-between mt-2">
                     <div className="truncate mr-2">
                       <span className="text-slate-400">Acc: </span>
@@ -87,6 +85,7 @@ export default function OrderHistoryModal({ isOpen, onClose }: { isOpen: boolean
                       <button
                         onClick={() => setShowPassId(showPassId === item.id ? null : item.id)}
                         className="p-1 text-slate-400 hover:text-white"
+                        title="Ẩn/Hiện Mật Khẩu"
                       >
                         {showPassId === item.id ? '👁️' : '🙈'}
                       </button>
@@ -99,7 +98,6 @@ export default function OrderHistoryModal({ isOpen, onClose }: { isOpen: boolean
                     </div>
                   </div>
                 ) : (
-                  /* Đơn Cày Thuê -> Hiện trạng thái xử lý */
                   <div className="flex justify-between items-center text-xs pt-1 border-t border-gray-200 mt-2">
                     <span className="text-gray-500">Trạng thái:</span>
                     <span className="bg-amber-100 text-amber-700 font-bold px-2 py-0.5 rounded-full text-[10px]">
